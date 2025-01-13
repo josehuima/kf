@@ -11,6 +11,7 @@ import {
   Text,
   Card,
   Blockquote,
+  Heading
 } from "@radix-ui/themes";
 import { Separator } from "@radix-ui/themes";
 import Link from "next/link";
@@ -145,9 +146,12 @@ export default function DashboardPage() {
                     </Inset>
                     <Text as="p" color="orange" align="center" size="3">
                       <Strong>
+                        
+                        <Heading as="h3" size="3">
                         {getProperty(note, "tipologia")} -{" "}
                         {getProperty(note, "localizacao")} -{" "}
                         {getProperty(note, "preco")}
+							</Heading>
                       </Strong>
                     </Text>
                     <Blockquote>
