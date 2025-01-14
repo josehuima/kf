@@ -1,5 +1,6 @@
 import { Theme } from  '@radix-ui/themes'
 import "@radix-ui/themes/styles.css";
+
 import LogoHeader from './components/parts/LogoHeader';
 import { NotesProvider } from './context/NotesContext';
 

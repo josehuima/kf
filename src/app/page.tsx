@@ -11,10 +11,12 @@ import {
   Text,
   Card,
   Blockquote,
-  Heading
+  Heading,
+  Grid, Link,
+  TextField
 } from "@radix-ui/themes";
 import { Separator } from "@radix-ui/themes";
-import Link from "next/link";
+
 
 const getProperty = (note: any, property: string) => {
   return note[property];
@@ -72,32 +74,26 @@ export default function DashboardPage() {
         </div>
 
         {/* Filtros */}
-        <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between mb-6">
-          <input
-            type="text"
-            placeholder="Filtrar por descrição"
-            className="border border-gray-300 rounded-lg p-2 w-full md:w-64"
-            value={filterKeyword}
-            onChange={(e) => setFilterKeyword(e.target.value)}
-          />
+        <div className="flex flex-wrap items-center gap-4 justify-between">
+        <Box maxWidth="500px">
+  <TextField.Root size="2" placeholder="Filtrar por descrição…" value={filterKeyword}
+    onChange={(e) => setFilterKeyword(e.target.value)} />
+    </Box>
+<Box pt="3" maxWidth="500px">
+  <Select.Root size="2" value={sortOption} onValueChange={(value) => setSortOption(value)}>
+    <Select.Trigger variant="surface" />
+    <Select.Content>
+      <Select.Group>
+        <Select.Label>Ordenar por</Select.Label>
+        <Select.Item value="created_at">Data de criação</Select.Item>
+        <Select.Item value="preco">Preço</Select.Item>
+        <Select.Item value="tipologia">Tipologia</Select.Item>
+      </Select.Group>
+    </Select.Content>
+  </Select.Root>
+  </Box>
+</div>
 
-          <Flex gap="3" align="center">
-            <Select.Root
-              value={sortOption}
-              onValueChange={(value) => setSortOption(value)}
-            >
-              <Select.Trigger variant="surface" />
-              <Select.Content>
-                <Select.Group>
-                  <Select.Label>Ordenar por</Select.Label>
-                  <Select.Item value="created_at">Data de criação</Select.Item>
-                  <Select.Item value="preco">Preço</Select.Item>
-                  <Select.Item value="tipologia">Tipologia</Select.Item>
-                </Select.Group>
-              </Select.Content>
-            </Select.Root>
-          </Flex>
-        </div>
 
         <Separator my="3" size="4" />
 
@@ -121,51 +117,49 @@ export default function DashboardPage() {
         )}
 
         {!loading && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {paginatedNotes.map((note) => (
-              <Box key={note.id}>
-                <Link href={`/notebook/${note.id}`} passHref>
-                  <Card
-                    size="2"
-                    className="border border-stone-300 rounded-lg overflow-hidden flex flex-col transform transition-transform duration-300 hover:scale-105 cursor-pointer"
-                  >
-                    <Inset clip="padding-box" side="top" pb="current">
-                      <div>
-                        <img
-                          style={{
-                            display: "block",
-                            objectFit: "cover",
-                            width: "100%",
-                            height: 140,
-                            backgroundColor: "var(--gray-5)",
-                          }}
-                          alt={getProperty(note, "descricao")}
-                          src="/images.png"
-                        />
-                      </div>
-                    </Inset>
-                    <Text as="p" color="orange" align="center" size="3">
-                      <Strong>
-                        
-                        <Heading as="h3" size="3">
-                        {getProperty(note, "tipologia")} -{" "}
-                        {getProperty(note, "localizacao")} -{" "}
-                        {getProperty(note, "preco")}
-							</Heading>
-                      </Strong>
-                    </Text>
-                    <Blockquote>
-                      {getProperty(note, "descricao")}
-                    </Blockquote>
-                    <Separator my="3" size="4" />
-                    <Text as="p" align="center" size="3">
-                      {formatDateDistance(getProperty(note, "created_at"))}.
-                    </Text>
-                  </Card>
-                </Link>
-              </Box>
-            ))}
-          </div>
+          <Grid gap="3"  columns={{
+            initial: "1", // 1 coluna para dispositivos menores
+            sm: "2", // 2 colunas para telas pequenas
+            md: "3", // 3 colunas para telas médias
+            lg: "4", // 4 colunas para telas grandes
+            xl: "5", // 5 colunas para telas maiores
+            
+          }}
+          width="auto"
+          pb="6"
+          >
+          {paginatedNotes.map((note, index) => (
+            <Card size="1">
+            <div key={note.id || index}>
+              <img
+                src="/images.png"
+                style={{ borderRadius: "var(--radius-1)" }}
+                className="w-full h-auto object-cover"
+                width="50"
+                height="50"
+                alt="Imagem do imóvel"
+              />
+              <Box>
+										<Text as="div" color="gray" trim="start">
+											<Link
+												href="#"
+												underline="hover"
+												highContrast
+												size="2"
+												weight="bold"
+												onClick={(e) => e.preventDefault()}
+											>
+												{note.tipologia}
+											</Link>
+										</Text>
+										<Text as="div" color="gray" size="1" trim="end">
+											{note.localizacao}
+										</Text>
+									</Box>
+            </div>
+            </Card>
+          ))}
+        </Grid>
         )}
 
         {/* Controles de Paginação */}
