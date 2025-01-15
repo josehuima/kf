@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { formatDateDistance } from "./lib/utils";
 import { useNotes } from "./context/NotesContext";
 import {
+  Button, 
   Box,
   Flex,
   Select,
@@ -126,7 +127,7 @@ export default function DashboardPage() {
             
           }}
           width="auto"
-          pb="6"
+          pb="6" className="transform transition-transform duration-300 hover:scale-105 cursor-pointer"
           >
           {paginatedNotes.map((note, index) => (
             <Card size="1">
@@ -163,22 +164,25 @@ export default function DashboardPage() {
         )}
 
         {/* Controles de Paginação */}
-        <div className="flex justify-center mt-6">
-          <button
+        <div className="flex justify-center mt-6 space-x-4 items-center text-gray-700 text-sm font-semibold text-center w-full max-w-2xl mx-auto pr-4">
+          <Button
+          color="orange"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
             className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
           >
             Anterior
-          </button>
-          <span className="px-4 py-2">{`Página ${currentPage} de ${totalPages}`}</span>
-          <button
+          </Button>
+          <span className="px-4 py-2 pl-5">{`Página ${currentPage} de ${totalPages}`}</span>
+          <Button
+          color="orange"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+            className="p-8 bg-gray-300 rounded disabled:opacity-50"
+            variant="solid"
           >
             Próxima
-          </button>
+          </Button>
         </div>
       </div>
     </div>
