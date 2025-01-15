@@ -17,6 +17,7 @@ import {
   TextField
 } from "@radix-ui/themes";
 import { Separator } from "@radix-ui/themes";
+import Image from "next/image";
 
 
 const getProperty = (note: any, property: string) => {
@@ -118,49 +119,56 @@ export default function DashboardPage() {
         )}
 
         {!loading && (
-          <Grid gap="3"  columns={{
+          <Grid
+          gap="3"
+          columns={{
             initial: "1", // 1 coluna para dispositivos menores
             sm: "2", // 2 colunas para telas pequenas
             md: "3", // 3 colunas para telas médias
             lg: "4", // 4 colunas para telas grandes
             xl: "5", // 5 colunas para telas maiores
-            
           }}
           width="auto"
-          pb="6" className="transform transition-transform duration-300 hover:scale-105 cursor-pointer"
-          >
-          {paginatedNotes.map((note, index) => (
-            <Card size="1">
-            <div key={note.id || index}>
-              <img
-                src="/images.png"
-                style={{ borderRadius: "var(--radius-1)" }}
-                className="w-full h-auto object-cover"
-                width="50"
-                height="50"
-                alt="Imagem do imóvel"
-              />
-              <Box>
-										<Text as="div" color="gray" trim="start">
-											<Link
-												href="#"
-												underline="hover"
-												highContrast
-												size="2"
-												weight="bold"
-												onClick={(e) => e.preventDefault()}
-											>
-												{note.tipologia}
-											</Link>
-										</Text>
-										<Text as="div" color="gray" size="1" trim="end">
-											{note.localizacao}
-										</Text>
-									</Box>
-            </div>
+          pb="6"
+          className="transform transition-transform duration-300 hover:scale-105 cursor-pointer"
+        >
+          {paginatedNotes.map((note) => (
+            <Card
+              key={note.id} // Mover o 'key' para o nível do Card
+              size="1"
+              
+            >
+              <div className="overflow-hidden max-w-[400px]">
+                <Image
+                width="300"
+                height="270"
+                  alt={note.descricao}
+                  src="/images.png"
+                  style={{ borderRadius: "var(--radius-2)" }}
+                  className="w-full h-auto object-cover rounded-lg"
+                />
+                <Box>
+                  <Text as="div" color="gray" trim="start">
+                    <Link
+                      href="#"
+                      underline="hover"
+                      highContrast
+                      size="2"
+                      weight="bold"
+                      onClick={(e) => e.preventDefault()}
+                    >
+                      {note.tipologia}
+                    </Link>
+                  </Text>
+                  <Text as="div" color="gray" size="1" trim="end">
+                    {note.localizacao}
+                  </Text>
+                </Box>
+              </div>
             </Card>
           ))}
         </Grid>
+        
         )}
 
         {/* Controles de Paginação */}
