@@ -9,7 +9,7 @@ interface PageProps {
 }
 
 async function Page({ params }: PageProps) {
-    const { stateId } = params;
+    const { stateId } = await params;
 
     // Inicializar Supabase
     const supabase = createClient(
