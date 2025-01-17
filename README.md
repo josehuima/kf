@@ -127,3 +127,59 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 					</Flex>
 				</Card>
 
+
+
+
+
+
+
+
+
+
+
+
+    <Box key={note.id}>
+              
+                <Link href={`/notebook/${note.id}`} passHref>
+                  <Card
+                    size="2"
+                    className="border border-stone-300 rounded-lg overflow-hidden flex flex-col transform transition-transform duration-300 hover:scale-105 cursor-pointer"
+                  >
+                    <Inset clip="padding-box" side="top" pb="current">
+                      <div>
+                        <img
+                          style={{
+                            display: "block",
+                            objectFit: "cover",
+                            width: "100%",
+                            height: 140,
+                            backgroundColor: "var(--gray-5)",
+                          }}
+                          alt={getProperty(note, "descricao")}
+                          src="/images.png"
+                        />
+                      </div>
+                    </Inset>
+                    <Text as="p" color="orange" align="center" size="3">
+                      
+                        
+                       
+                        {getProperty(note, "tipologia")} -{" "}
+                        {getProperty(note, "localizacao")} -{" "}
+                        {getProperty(note, "preco")}
+					
+                      
+                    </Text>
+                    <Text size="6" weight="bold">
+							$149
+						</Text>
+                    <Blockquote>
+                      {getProperty(note, "descricao")}
+                    </Blockquote>
+                    <Separator my="3" size="4" />
+                    <Text as="p" align="center" size="3">
+                      {formatDateDistance(getProperty(note, "created_at"))}.
+                    </Text>
+                  </Card>
+                </Link>
+              </Box>

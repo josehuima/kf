@@ -67,7 +67,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="grainy min-h-screen">
+    <div className="bg-gradient-to-r min-h-screen grainy from-rose-100 to-teal-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="mb-6">
           <h3 className="text-3xl font-bold text-gray-900 text-center md:text-left">
@@ -78,13 +78,13 @@ export default function DashboardPage() {
         {/* Filtros */}
         <div className="flex flex-wrap items-center gap-4 justify-between">
         <Box maxWidth="500px">
-  <TextField.Root size="2" placeholder="Filtrar por descrição…" value={filterKeyword}
+  <TextField.Root color="orange" size="2" placeholder="Filtrar por descrição…" value={filterKeyword}
     onChange={(e) => setFilterKeyword(e.target.value)} />
     </Box>
 <Box pt="3" maxWidth="500px">
   <Select.Root size="2" value={sortOption} onValueChange={(value) => setSortOption(value)}>
-    <Select.Trigger variant="surface" />
-    <Select.Content>
+    <Select.Trigger color="orange" variant="surface" />
+    <Select.Content color="orange">
       <Select.Group>
         <Select.Label>Ordenar por</Select.Label>
         <Select.Item value="created_at">Data de criação</Select.Item>
