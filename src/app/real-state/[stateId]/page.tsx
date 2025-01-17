@@ -2,13 +2,10 @@ import { createClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import * as React from 'react';
 
-interface PageProps {
-    params: {
-        stateId: string;
-    };
-}
 
-async function Page({ params }: PageProps) {
+type Params = Promise<{ stateId: string[] }>;
+
+async function Page({ params }: { params: Params }) {
     const { stateId } = await params;
 
     // Inicializar Supabase
