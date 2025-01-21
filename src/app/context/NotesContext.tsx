@@ -1,5 +1,4 @@
-// ./src/context/NotesContext.tsx
-"use client"
+"use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
@@ -11,6 +10,7 @@ type Note = {
   preco: number;
   descricao: string;
   created_at: string;
+  images: string[]; // Campo para URLs das imagens
 };
 
 type NotesContextType = {
@@ -34,27 +34,65 @@ export const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
   const fetchNotes = async () => {
     setLoading(true);
     setError(null);
- 
-    try {
-      //const supabase = createClient('https://iehsmuxjlrzfwordijiy.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllaHNtdXhqbHJ6ZndvcmRpaml5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDEzMzkzNjcsImV4cCI6MjAxNjkxNTM2N30.8hmf2igDjxqcd6WH0LgxLhhzp1z5ll4TZ1hTEiKYRYM');
-      const supabase = createClient('https://jqidnghoneocwhtcpbjn.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxaWRuZ2hvbmVvY3dodGNwYmpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU1NjcyOTUsImV4cCI6MjA1MTE0MzI5NX0.FWrf7O3VNr4RTo7KoeGAuwolsz7koWqEuwza48wsynM'); // Cria o cliente Supabase sem dependência de cookies diretamente
 
-      const { data, error } = await supabase.from("imobiliarios").select(); // Busca as notas
+    try {
+      const supabase = createClient(
+        "https://jqidnghoneocwhtcpbjn.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxaWRuZ2hvbmVvY3dodGNwYmpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU1NjcyOTUsImV4cCI6MjA1MTE0MzI5NX0.FWrf7O3VNr4RTo7KoeGAuwolsz7koWqEuwza48wsynM"
+      );
+
+      console.log("Buscando imóveis...");
+      const { data: properties, error } = await supabase.from("imobiliarios").select();
 
       if (error) {
-        throw new Error(error.message);
+        throw new Error(`Erro ao buscar imóveis: ${error.message}`);
       }
+      console.log("Imóveis encontrados:", properties);
 
-      setNotes(data);
+      const propertiesWithImages = await Promise.all(
+        properties.map(async (property: Note) => {
+          console.log(`Buscando fotos para o imóvel ID: ${property.id}`);
+          const { data: photos, error: photoError } = await supabase
+            .from("property_photos")
+            .select("photo_path")
+            .eq("property_id", property.id.toString());
+
+          if (photoError) {
+            console.error(`Erro ao buscar fotos para o imóvel ${property.id}:`, photoError);
+            return { ...property, images: ["/default-placeholder.jpg"] };
+          }
+
+          console.log(`Fotos encontradas para o imóvel ${property.id}:`, photos);
+
+          const images = photos
+            .map((photo) => {
+              const { data } = supabase.storage
+                .from("kubico-facil")
+                .getPublicUrl(photo.photo_path);
+
+              console.log(`URL gerada para a imagem:`, data?.publicUrl);
+              
+              return data?.publicUrl || null;
+            })
+            .filter((url) => url !== null);
+
+          return { ...property, images: images.length > 0 ? images : ["/326547605_714729620344884_1344181896237920632_n.jpg"] };
+        })
+      );
+
+      console.log("Imóveis com imagens:", propertiesWithImages);
+      setNotes(propertiesWithImages);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro desconhecido");
+      const errorMessage = err instanceof Error ? err.message : "Erro desconhecido";
+      console.error("Erro ao carregar imóveis:", errorMessage);
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchNotes(); // Carrega as notas ao montar o provedor
+    fetchNotes();
   }, []);
 
   return (

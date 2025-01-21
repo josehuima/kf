@@ -66,6 +66,13 @@ export default function DashboardPage() {
     }
   };
 
+
+  console.log('notas encontradas: ', filteredNotes);
+  
+  const customLoader = ({ src }: { src: string }) => {
+    return src;
+  };
+
   return (
     <div className="bg-gradient-to-r min-h-screen grainy from-rose-100 to-teal-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -138,15 +145,14 @@ export default function DashboardPage() {
               size="1"
               
             >
-              <div className="overflow-hidden max-w-[400px]">
-                <Image
-                width="300"
-                height="270"
-                  alt={note.descricao}
-                  src="/images.png"
-                  style={{ borderRadius: "var(--radius-2)" }}
-                  className="w-full h-auto object-cover rounded-lg"
-                />
+              
+                
+
+<div className="overflow-hidden max-w-[400px]">
+              {note.images.map((image, index) => (
+              <Image loader={customLoader} priority={false} quality={75} style={{ borderRadius: "var(--radius-2)" }} key={index} src={image} alt={`Foto ${index + 1}`}  width="300"
+              height="270" />
+            ))}
                 <Box>
                   <Text as="div" color="gray" trim="start">
                     <Link
