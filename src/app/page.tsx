@@ -18,6 +18,12 @@ import {
 } from "@radix-ui/themes";
 import { Separator } from "@radix-ui/themes";
 import Image from "next/image";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+
 
 
 const getProperty = (note: any, property: string) => {
@@ -149,10 +155,20 @@ export default function DashboardPage() {
                 
 
 <div className="overflow-hidden max-w-[400px]">
-              {note.images.map((image, index) => (
+<Swiper
+                    modules={[Navigation, Pagination]}
+                    navigation
+                    pagination={{ clickable: true }}
+                    loop
+                    spaceBetween={10}
+                  >
+              {note.images.map((image: string, index: number) => (
+                <SwiperSlide key={index}>
               <Image loader={customLoader} priority={false} quality={75} style={{ borderRadius: "var(--radius-2)" }} key={index} src={image} alt={`Foto ${index + 1}`}  width="300"
               height="270" />
+              </SwiperSlide>
             ))}
+            </Swiper>
                 <Box>
                   <Text as="div" color="gray" trim="start">
                     <Link
