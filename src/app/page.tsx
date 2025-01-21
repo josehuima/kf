@@ -1,9 +1,10 @@
 "use client";
+
 import React, { useState } from "react";
 import { formatDateDistance } from "./lib/utils";
 import { useNotes } from "./context/NotesContext";
 import {
-  Button, 
+  Button,
   Box,
   Flex,
   Select,
@@ -13,8 +14,9 @@ import {
   Card,
   Blockquote,
   Heading,
-  Grid, Link,
-  TextField
+  Grid,
+  Link,
+  TextField,
 } from "@radix-ui/themes";
 import { Separator } from "@radix-ui/themes";
 import Image from "next/image";
@@ -23,8 +25,6 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
-
-
 
 const getProperty = (note: any, property: string) => {
   return note[property];
@@ -72,9 +72,6 @@ export default function DashboardPage() {
     }
   };
 
-
-  console.log('notas encontradas: ', filteredNotes);
-  
   const customLoader = ({ src }: { src: string }) => {
     return src;
   };
@@ -90,25 +87,33 @@ export default function DashboardPage() {
 
         {/* Filtros */}
         <div className="flex flex-wrap items-center gap-4 justify-between">
-        <Box maxWidth="500px">
-  <TextField.Root color="orange" size="2" placeholder="Filtrar por descrição…" value={filterKeyword}
-    onChange={(e) => setFilterKeyword(e.target.value)} />
-    </Box>
-<Box pt="3" maxWidth="500px">
-  <Select.Root size="2" value={sortOption} onValueChange={(value) => setSortOption(value)}>
-    <Select.Trigger color="orange" variant="surface" />
-    <Select.Content color="orange">
-      <Select.Group>
-        <Select.Label>Ordenar por</Select.Label>
-        <Select.Item value="created_at">Data de criação</Select.Item>
-        <Select.Item value="preco">Preço</Select.Item>
-        <Select.Item value="tipologia">Tipologia</Select.Item>
-      </Select.Group>
-    </Select.Content>
-  </Select.Root>
-  </Box>
-</div>
-
+          <Box maxWidth="500px">
+            <TextField.Root
+              color="orange"
+              size="2"
+              placeholder="Filtrar por descrição…"
+              value={filterKeyword}
+              onChange={(e) => setFilterKeyword(e.target.value)}
+            />
+          </Box>
+          <Box pt="3" maxWidth="500px">
+            <Select.Root
+              size="2"
+              value={sortOption}
+              onValueChange={(value) => setSortOption(value)}
+            >
+              <Select.Trigger color="orange" variant="surface" />
+              <Select.Content color="orange">
+                <Select.Group>
+                  <Select.Label>Ordenar por</Select.Label>
+                  <Select.Item value="created_at">Data de criação</Select.Item>
+                  <Select.Item value="preco">Preço</Select.Item>
+                  <Select.Item value="tipologia">Tipologia</Select.Item>
+                </Select.Group>
+              </Select.Content>
+            </Select.Root>
+          </Box>
+        </div>
 
         <Separator my="3" size="4" />
 
@@ -133,71 +138,78 @@ export default function DashboardPage() {
 
         {!loading && (
           <Grid
-          gap="3"
-          columns={{
-            initial: "1", // 1 coluna para dispositivos menores
-            sm: "2", // 2 colunas para telas pequenas
-            md: "3", // 3 colunas para telas médias
-            lg: "4", // 4 colunas para telas grandes
-            xl: "5", // 5 colunas para telas maiores
-          }}
-          width="auto"
-          pb="6"
-          className="transform transition-transform duration-300 hover:scale-105 cursor-pointer"
-        >
-          {paginatedNotes.map((note) => (
-            <Card
-              key={note.id} // Mover o 'key' para o nível do Card
-              size="1"
-              
-            >
-              
-                
-
-<div className="overflow-hidden max-w-[400px]">
-<Swiper
+            gap="3"
+            columns={{
+              initial: "1", // 1 coluna para dispositivos menores
+              sm: "2", // 2 colunas para telas pequenas
+              md: "3", // 3 colunas para telas médias
+              lg: "4", // 4 colunas para telas grandes
+              xl: "5", // 5 colunas para telas maiores
+            }}
+            width="auto"
+            pb="6"
+            className="transform transition-transform duration-300 hover:scale-105 cursor-pointer"
+          >
+            {paginatedNotes.map((note) => (
+              <Card key={note.id} size="1">
+                <div className="overflow-hidden max-w-[400px]">
+                  <Swiper
                     modules={[Navigation, Pagination]}
                     navigation
                     pagination={{ clickable: true }}
                     loop
                     spaceBetween={10}
                   >
-              {note.images.map((image: string, index: number) => (
-                <SwiperSlide key={index}>
-              <Image loader={customLoader} priority={false} quality={75} style={{ borderRadius: "var(--radius-2)" }} key={index} src={image} alt={`Foto ${index + 1}`}  width="300"
-              height="270" />
-              </SwiperSlide>
+                    {note.images.map((image: string, index: number) => (
+                      <SwiperSlide key={index}>
+                        <Image
+                          loader={customLoader}
+                          priority={false}
+                          quality={75}
+                          style={{ borderRadius: "var(--radius-2)" }}
+                          key={index}
+                          src={image}
+                          alt={`Foto ${index + 1}`}
+                          width="300"
+                          height="270"
+                        />
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                  <Box>
+                    <Text align="center" as="div" color="orange" trim="start">
+                      <Link
+                        href={`/real-state/${note.id}`}
+                        underline="hover"
+                        highContrast
+                        size="2"
+                        weight="bold"
+                      >
+                        {note.tipologia} - {note.localizacao} -{" "}
+                        {note.preco
+                          .toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "AOA",
+                          })
+                          .replace("AOA", "")
+                          .trim()}{" "}
+                        Kz
+                      </Link>
+                    </Text>
+                    <Text align="center" as="div" color="gray" size="1" trim="end">
+                      {formatDateDistance(note.created_at)}
+                    </Text>
+                  </Box>
+                </div>
+              </Card>
             ))}
-            </Swiper>
-                <Box>
-                  <Text align="center" as="div" color="orange" trim="start">
-                    <Link
-                      href="#"
-                      underline="hover"
-                      highContrast
-                      size="2"
-                      weight="bold"
-                      onClick={(e) => e.preventDefault()}
-                    >
-                      {note.tipologia} - {note.localizacao} - {note.preco.toLocaleString("pt-BR", { style: "currency", currency: "AOA" }).replace("AOA", "").trim()} Kz
-                      
-                    </Link>
-                  </Text>
-                  <Text align="center" as="div" color="gray" size="1" trim="end">
-                    {formatDateDistance(note.created_at)}
-                  </Text>
-                </Box>
-              </div>
-            </Card>
-          ))}
-        </Grid>
-        
+          </Grid>
         )}
 
         {/* Controles de Paginação */}
         <div className="flex justify-center mt-6 space-x-4 items-center text-gray-700 text-sm font-semibold text-center w-full max-w-2xl mx-auto pr-4">
           <Button
-          color="orange"
+            color="orange"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
             className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
@@ -206,7 +218,7 @@ export default function DashboardPage() {
           </Button>
           <span className="px-4 py-2 pl-5">{`Página ${currentPage} de ${totalPages}`}</span>
           <Button
-          color="orange"
+            color="orange"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
             className="p-8 bg-gray-300 rounded disabled:opacity-50"
