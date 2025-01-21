@@ -170,7 +170,7 @@ export default function DashboardPage() {
             ))}
             </Swiper>
                 <Box>
-                  <Text as="div" color="gray" trim="start">
+                  <Text align="center" as="div" color="orange" trim="start">
                     <Link
                       href="#"
                       underline="hover"
@@ -179,11 +179,12 @@ export default function DashboardPage() {
                       weight="bold"
                       onClick={(e) => e.preventDefault()}
                     >
-                      {note.tipologia} - {note.preco.toLocaleString("pt-BR", { style: "currency", currency: "AOA" })}
+                      {note.tipologia} - {note.localizacao} - {note.preco.toLocaleString("pt-BR", { style: "currency", currency: "AOA" }).replace("AOA", "").trim()} Kz
+                      
                     </Link>
                   </Text>
-                  <Text as="div" color="gray" size="1" trim="end">
-                    {note.localizacao}
+                  <Text align="center" as="div" color="gray" size="1" trim="end">
+                    {formatDateDistance(note.created_at)}
                   </Text>
                 </Box>
               </div>
