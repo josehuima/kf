@@ -6,6 +6,7 @@ import { useNotes } from "./context/NotesContext";
 import {
   Button,
   Box,
+  Container,
   Flex,
   Select,
   Inset,
@@ -207,7 +208,8 @@ export default function DashboardPage() {
         )}
 
         {/* Controles de Paginação */}
-        <div className="flex justify-center mt-6 space-x-4 items-center text-gray-700 text-sm font-semibold text-center w-full max-w-2xl mx-auto pr-4">
+        
+        <Flex justify="center" gap="9" >
           <Button
             color="orange"
             onClick={() => handlePageChange(currentPage - 1)}
@@ -216,17 +218,18 @@ export default function DashboardPage() {
           >
             Anterior
           </Button>
-          <span className="px-4 py-2 pl-5">{`Página ${currentPage} de ${totalPages}`}</span>
+          <span className="px-4 py-2 p-8">{`Página ${currentPage} de ${totalPages}`}</span>
           <Button
             color="orange"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="p-8 bg-gray-300 rounded disabled:opacity-50"
+            className="pl-8 p-8 bg-gray-300 rounded disabled:opacity-50"
             variant="solid"
           >
             Próxima
           </Button>
-        </div>
+        </Flex >
+       
       </div>
     </div>
   );
