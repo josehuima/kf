@@ -6,7 +6,7 @@ import { useNotes } from "./context/NotesContext";
 import {
   Button,
   Box,
-  Container,
+  Spinner,
   Flex,
   Select,
   Inset,
@@ -119,10 +119,10 @@ export default function DashboardPage() {
         <Separator my="3" size="4" />
 
         {loading && (
-          <div className="flex justify-center items-center">
-            <div className="spinner-border animate-spin inline-block w-8 h-8 border-4 rounded-full text-blue-500"></div>
-            <p className="ml-2">Buscando registros, por favor aguarde...</p>
-          </div>
+          <Flex align="center" gapX="9" justify="center" gap="3" className="text-center">
+            <Spinner size="3" />
+            <Text wrap="balance" align="center" color="orange">Buscando registros, por favor aguarde...</Text>
+          </Flex>
         )}
 
         {error && !loading && (
