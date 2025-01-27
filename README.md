@@ -1,185 +1,133 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+import { createClient } from "@supabase/supabase-js";
+import { redirect } from "next/navigation";
+import React from "react";
+import Image from "next/image";
+import { Table, Box, Flex, Text, Card, Button, Separator } from "@radix-ui/themes";
 
-## Getting Started
+type Imobiliario = {
+  id: string;
+  descricao: string;
+  fotos: string[] | null;
+};
 
-First, run the development server:
+type Params = {
+  params: { stateId: string };
+};
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+async function Page({ params }: Params) {
+  const { stateId } = await params;
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+  // Inicializar Supabase
+  const supabase = createClient(
+    "https://jqidnghoneocwhtcpbjn.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxaWRuZ2hvbmVvY3dodGNwYmpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU1NjcyOTUsImV4cCI6MjA1MTE0MzI5NX0.FWrf7O3VNr4RTo7KoeGAuwolsz7koWqEuwza48wsynM"
+  );
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+  // Consultar os dados
+  const { data: notes, error } = await supabase
+    .from("imobiliarios")
+    .select()
+    .eq("temp_uuid", stateId);
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+    if (error || !notes || notes.length === 0) {
+      redirect("/");
+    }
 
-## Learn More
+  const imobiliario = notes[0];
+  const fotos = Array.isArray(imobiliario.fotos) ? imobiliario.fotos : [];
 
-To learn more about Next.js, take a look at the following resources:
+  return (
+    <Box className="min-h-screen p-8 ">
+      <Flex className="max-w-7xl mx-auto flex-col lg:flex-row bg-white rounded-lg shadow-lg overflow-hidden">
+        
+        {/* Seção de Informações do Imóvel */}
+        <Box className="lg:w-3/4 p-6">
+          {/* Título */}
+          <Text size="4" weight="bold" className="text-orange-600 mb-6">
+            {imobiliario.descricao}
+          </Text>
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+          {/* Galeria de Fotos */}
+          {fotos.length > 0 ? (
+            <Flex className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+              {fotos.map((foto: string, index: number) => (
+                <Card key={index} className="overflow-hidden rounded-lg shadow-md transition-shadow hover:shadow-lg">
+                  <Image
+                    src={foto}
+                    alt={`Foto ${index + 1}`}
+                    width={600}
+                    height={400}
+                    className="object-cover w-full h-full"
+                  />
+                </Card>
+              ))}
+            </Flex>
+          ) : (
+            <Text as="p" className="text-gray-500 text-center">
+              Nenhuma fotografia disponível para este imóvel.
+            </Text>
+          )}
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+          {/* Detalhes */}
+          <Box className="bg-orange-50 p-6 rounded-lg shadow-md mb-8">
+            <Text  size="2" weight="light" className="mb-4">Detalhes do Imóvel</Text>
+            <Text as="p" size="2" className="text-gray-700">{imobiliario.descricao}</Text>
+          </Box>
 
-## Deploy on Vercel
+          {/* Tabela de Informações */}
+          <Box className="overflow-x-auto">
+            <Table.Root className="w-full">
+              <Table.Header>
+                <Table.Row>
+                  <Table.ColumnHeaderCell className="text-left ">Descrição</Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell className="text-left">Fotos</Table.ColumnHeaderCell>
+                </Table.Row>
+              </Table.Header>
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+              <Table.Body>
+                <Table.Row>
+                  <Table.RowHeaderCell>{imobiliario.descricao}</Table.RowHeaderCell>
+                  <Table.Cell>
+                    {fotos.length > 0 ? (
+                      <Flex className="gap-2">
+                        {fotos.slice(0, 3).map((foto: string, index: number) => (
+                          <Box key={index} className="w-16 h-16 overflow-hidden rounded-lg shadow-md">
+                            <Image
+                              src={foto}
+                              alt={`Thumbnail ${index + 1}`}
+                              width={64}
+                              height={64}
+                              className="object-cover w-full h-full"
+                            />
+                          </Box>
+                        ))}
+                      </Flex>
+                    ) : (
+                      <Text as="span" className="text-gray-500">Sem fotos</Text>
+                    )}
+                  </Table.Cell>
+                </Table.Row>
+              </Table.Body>
+            </Table.Root>
+          </Box>
+        </Box>
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+        {/* Componente Lateral de Contato */}
+        <Separator orientation="vertical" className="hidden lg:block" />
+        <Box className="lg:w-1/4 p-6 bg-orange-50 rounded-lg shadow-md">
+          <Text size="2" weight="bold" className="text-orange-600 mb-4">Contacte-nos</Text>
+          <Text as="p" size="2" className="text-gray-700 mb-4">
+            Para arrendar ou comprar este imóvel, entre em contato conosco:
+          </Text>
+          <Box className="text-lg">
+            <Text as="p" className="mb-2"><strong>Telefone:</strong> +244 912 345 678</Text>
+            <Text as="p" className="mb-2"><strong>Email:</strong> imobiliaria@example.com</Text>
+            <Text as="p" className="mb-2"><strong>Localização:</strong> Av. Principal, 123, Lubango, Huíla, Angola</Text>
+          </Box>
+        </Box>
+      </Flex>
+    </Box>
+  );
+}
 
-
-
-<Flex align="end" justify="between" mb="2">
-						<Box>
-							<Flex mb="1">
-								<Link
-									href="#"
-									underline="hover"
-									size="2"
-									color="gray"
-									highContrast
-									tabIndex={tabIndex}
-									onClick={(e) => e.preventDefault()}
-								>
-									Footwear
-								</Link>
-							</Flex>
-
-							<Heading as="h3" size="3">
-								Sneakers #12
-							</Heading>
-						</Box>
-
-						<Text size="6" weight="bold">
-							$149
-						</Text>
-					</Flex>
-
-					<Text as="p" size="2" color="gray" mb="4">
-						Love at the first sight for enthusiasts seeking a fresh and
-						whimsical style.
-					</Text>
-
-					<Box>
-						<Separator size="4" my="4" />
-					</Box>
-
-					<Flex gap="2" align="end">
-						<Flex direction="column" flexGrow="1">
-							<Label asChild>
-								<Text size="1" color="gray" mb="1">
-									Color
-								</Text>
-							</Label>
-
-							<Select.Root defaultValue="Pastel" size="2">
-								<Select.Trigger tabIndex={tabIndex} variant="soft" />
-								<Select.Content
-									variant="soft"
-									container={portalContainer}
-									position="popper"
-								>
-									<Select.Item value="Pastel">Pastel</Select.Item>
-									<Select.Item value="Bright">Bright</Select.Item>
-								</Select.Content>
-							</Select.Root>
-						</Flex>
-
-						<Flex direction="column" minWidth="80px">
-							<Label asChild>
-								<Text size="1" color="gray" mb="1">
-									Size
-								</Text>
-							</Label>
-							<Select.Root defaultValue="8" size="2">
-								<Select.Trigger tabIndex={tabIndex} variant="soft" />
-								<Select.Content
-									variant="soft"
-									container={portalContainer}
-									position="popper"
-								>
-									{Array.from({ length: 12 }, (_, i) => (
-										<Select.Item key={i} value={String(i * 0.5 + 5)}>
-											{i * 0.5 + 5}
-										</Select.Item>
-									))}
-								</Select.Content>
-							</Select.Root>
-						</Flex>
-
-						<Button
-							tabIndex={tabIndex}
-							size="2"
-							variant="solid"
-							color="gray"
-							highContrast
-						>
-							Buy
-						</Button>
-					</Flex>
-				</Card>
-
-
-
-
-
-
-
-
-
-
-
-
-    <Box key={note.id}>
-              
-                <Link href={`/notebook/${note.id}`} passHref>
-                  <Card
-                    size="2"
-                    className="border border-stone-300 rounded-lg overflow-hidden flex flex-col transform transition-transform duration-300 hover:scale-105 cursor-pointer"
-                  >
-                    <Inset clip="padding-box" side="top" pb="current">
-                      <div>
-                        <img
-                          style={{
-                            display: "block",
-                            objectFit: "cover",
-                            width: "100%",
-                            height: 140,
-                            backgroundColor: "var(--gray-5)",
-                          }}
-                          alt={getProperty(note, "descricao")}
-                          src="/images.png"
-                        />
-                      </div>
-                    </Inset>
-                    <Text as="p" color="orange" align="center" size="3">
-                      
-                        
-                       
-                        {getProperty(note, "tipologia")} -{" "}
-                        {getProperty(note, "localizacao")} -{" "}
-                        {getProperty(note, "preco")}
-					
-                      
-                    </Text>
-                    <Text size="6" weight="bold">
-							$149
-						</Text>
-                    <Blockquote>
-                      {getProperty(note, "descricao")}
-                    </Blockquote>
-                    <Separator my="3" size="4" />
-                    <Text as="p" align="center" size="3">
-                      {formatDateDistance(getProperty(note, "created_at"))}.
-                    </Text>
-                  </Card>
-                </Link>
-              </Box>
+export default Page;
