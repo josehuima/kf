@@ -4,18 +4,12 @@ import React from "react";
 import Image from "next/image";
 import { Table } from "@radix-ui/themes";
 
-type Imobiliario = {
-  id: string;
-  descricao: string;
-  fotos: string[] | null;
-};
 
-type Params = {
-  params: { stateId: string };
-};
 
-async function Page({ params }: Params) {
-  const { stateId } = await params;
+export type paramsType = Promise<{ stateId: string }>;
+
+async function Page(props: { params: paramsType }) {
+  const { stateId } = await props.params;
 
   // Inicializar Supabase
   const supabase = createClient(
@@ -29,7 +23,9 @@ async function Page({ params }: Params) {
     .select()
     .eq("temp_uuid", stateId);
 
- 
+    if (error || !notes || notes.length === 0) {
+      redirect("/");
+    }
 
   const imobiliario = notes[0];
   const fotos = Array.isArray(imobiliario.fotos) ? imobiliario.fotos : [];
