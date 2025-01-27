@@ -27,16 +27,14 @@ import "swiper/css/pagination";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 
-const getProperty = (note: any, property: string) => {
-  return note[property];
-};
+const getProperty = (note: any, property: string) => note[property];
 
 export default function DashboardPage() {
   const { notes, loading, error } = useNotes();
   const [sortOption, setSortOption] = useState<string>("created_at");
   const [filterKeyword, setFilterKeyword] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const itemsPerPage = 10; // Número de itens por página
+  const itemsPerPage = 8;
 
   const sortedNotes = notes
     ? notes.sort((a, b) => {
@@ -52,15 +50,14 @@ export default function DashboardPage() {
       })
     : [];
 
-  const filteredNotes = sortedNotes.filter((note) => {
-    const searchableFields = ["tipologia", "descricao", "localizacao"];
-    return searchableFields.some((field) =>
+  const filteredNotes = sortedNotes.filter((note) =>
+    ["tipologia", "descricao", "localizacao"].some((field) =>
       getProperty(note, field)
-        .toString()
-        .toLowerCase()
-        .includes(filterKeyword.toLowerCase())
-    );
-  });
+        ?.toString()
+        ?.toLowerCase()
+        ?.includes(filterKeyword.toLowerCase())
+    )
+  );
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -68,168 +65,128 @@ export default function DashboardPage() {
   const totalPages = Math.ceil(filteredNotes.length / itemsPerPage);
 
   const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
-  const customLoader = ({ src }: { src: string }) => {
-    return src;
-  };
+  const customLoader = ({ src }: { src: string }) => src;
 
   return (
-    <div className="bg-gradient-to-r min-h-screen grainy from-rose-100 to-teal-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="mb-6">
-          <h3 className="text-3xl font-bold text-gray-900 text-center md:text-left">
-            Imóveis disponíveis
-          </h3>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br">
+      <div className="max-w-7xl mx-auto px-6 py-10">
+        <header className="text-center mb-10">
+          <Text size="8" weight="bold" color="orange">
+            Explore Imóveis Disponíveis
+          </Text>
+        </header>
 
         {/* Filtros */}
-        <div className="flex flex-wrap items-center gap-4 justify-between">
-          <Box maxWidth="500px">
-            <TextField.Root
-              color="orange"
-              size="2"
-              placeholder="Filtrar por descrição…"
-              value={filterKeyword}
-              onChange={(e) => setFilterKeyword(e.target.value)}
-            />
-          </Box>
-          <Box pt="3" maxWidth="500px">
-            <Select.Root
-              size="2"
-              value={sortOption}
-              onValueChange={(value) => setSortOption(value)}
-            >
-              <Select.Trigger color="orange" variant="surface" />
-              <Select.Content color="orange">
-                <Select.Group>
-                  <Select.Label>Ordenar por</Select.Label>
-                  <Select.Item value="created_at">Data de criação</Select.Item>
-                  <Select.Item value="preco">Preço</Select.Item>
-                  <Select.Item value="tipologia">Tipologia</Select.Item>
-                </Select.Group>
-              </Select.Content>
-            </Select.Root>
-          </Box>
-        </div>
+        <Flex direction="column" gap="4" mb="6">
+          <TextField.Root
+            placeholder="Buscar por descrição ou local..."
+            size="3"
+            color="orange"
+            value={filterKeyword}
+            onChange={(e) => setFilterKeyword(e.target.value)}
+          />
+          <Select.Root size="3"
+            value={sortOption}
+            onValueChange={(value) => setSortOption(value)}
+          >
+            <Select.Trigger  color="orange" />
+            <Select.Content>
+              <Select.Group>
+                <Select.Label>Ordenar por</Select.Label>
+                <Select.Item value="created_at">Data de Criação</Select.Item>
+                <Select.Item value="preco">Preço</Select.Item>
+                <Select.Item value="tipologia">Tipologia</Select.Item>
+              </Select.Group>
+            </Select.Content>
+          </Select.Root>
+        </Flex>
 
-        <Separator my="3" size="4" />
+        <Separator size="2" my="6" />
 
         {loading && (
-          <Flex align="center" gapX="9" justify="center" gap="3" className="text-center">
+          <Flex justify="center" align="center">
             <Spinner size="3" />
-            <Text wrap="balance" align="center" color="orange">Buscando registros, por favor aguarde...</Text>
+            <Text>Carregando imóveis...</Text>
           </Flex>
         )}
 
-        {error && !loading && (
-          <div className="text-center">
-            <h2 className="text-xl text-red-500">{error}</h2>
-          </div>
+        {error && (
+          <Text align="center" color="red">
+            Erro: {error}
+          </Text>
         )}
 
-        {filteredNotes.length === 0 && !loading && !error && (
-          <div className="text-center">
-            <h2 className="text-xl text-gray-500">Nenhum imóvel encontrado.</h2>
-          </div>
-        )}
-
-        {!loading && (
-          <Grid
-            gap="3"
-            columns={{
-              initial: "1", // 1 coluna para dispositivos menores
-              sm: "2", // 2 colunas para telas pequenas
-              md: "3", // 3 colunas para telas médias
-              lg: "4", // 4 colunas para telas grandes
-              xl: "5", // 5 colunas para telas maiores
-            }}
-            width="auto"
-            pb="6"
-            className="transform transition-transform duration-300 hover:scale-105 cursor-pointer"
-          >
+        {!loading && !error && (
+          <Grid columns="repeat(auto-fit, minmax(250px, 1fr))" gap="6">
             {paginatedNotes.map((note) => (
-              <Card key={note.id} size="1">
-                <div className="overflow-hidden max-w-[400px]">
-                  <Swiper
-                    modules={[Navigation, Pagination]}
-                    navigation
-                    pagination={{ clickable: true }}
-                    loop
-                    spaceBetween={10}
-                  >
-                    {note.images.map((image: string, index: number) => (
-                      <SwiperSlide key={index}>
-                        <Image
-                          loader={customLoader}
-                          priority={false}
-                          quality={75}
-                          style={{ borderRadius: "var(--radius-2)" }}
-                          key={index}
-                          src={image}
-                          alt={`Foto ${index + 1}`}
-                          width="300"
-                          height="270"
-                        />
-                      </SwiperSlide>
-                    ))}
-                  </Swiper>
-                  <Box>
-                    <Text align="center" as="div" color="orange" trim="start">
-                      <Link
-                        href={`/real-state/${note.id}`}
-                        underline="hover"
-                        highContrast
-                        size="2"
-                        weight="bold"
-                      >
-                        {note.tipologia} - {note.localizacao} -{" "}
-                        {note.preco
-                          .toLocaleString("pt-BR", {
-                            style: "currency",
-                            currency: "AOA",
-                          })
-                          .replace("AOA", "")
-                          .trim()}{" "}
-                        Kz
-                      </Link>
-                    </Text>
-                    <Text align="center" as="div" color="gray" size="1" trim="end">
-                      {formatDateDistance(note.created_at)}
-                    </Text>
-                  </Box>
-                </div>
+               <Link href={`/real-state/${note.temp_uuid}`} key={note.temp_uuid}>
+              <Card className="hover:shadow-xl transition-shadow">
+                <Swiper
+                  modules={[Navigation, Pagination]}
+                  navigation
+                  pagination={{ clickable: true }}
+                  loop
+                >
+                  {note.images.map((image: string, index: number) => (
+                    <SwiperSlide key={index}>
+                      <Image
+                        loader={customLoader}
+                        src={image}
+                        alt={`Imagem ${index + 1}`}
+                        width={300}
+                        height={200}
+                        className="rounded-lg"
+                      />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+                <Flex pt="3" direction="column">
+                <Text truncate align="center" size="2" weight="bold">
+                  {note.tipologia} - {note.localizacao} -{" "}
+                  {note.preco.toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "AOA",
+                  })}
+                </Text>
+                </Flex>
+                <Flex pt="1" direction="column">
+		
+		<Text align="center" color="gray" size="2">
+    Publicado {formatDateDistance(note.created_at)}
+		</Text>
+	</Flex>
+
+                 
+               
+               
               </Card>
+              </Link>
             ))}
           </Grid>
         )}
 
-        {/* Controles de Paginação */}
-        
-        <Flex justify="center" gap="9" >
+        <Flex justify="center" align="center" gap="9" mt="10">
           <Button
-            color="orange"
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+            color="orange"
           >
             Anterior
           </Button>
-          <span className="px-4 py-2 p-8">{`Página ${currentPage} de ${totalPages}`}</span>
+          <Text>
+            Página {currentPage} de {totalPages}
+          </Text>
           <Button
-            color="orange"
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className="pl-8 p-8 bg-gray-300 rounded disabled:opacity-50"
-            variant="solid"
+            color="orange"
           >
             Próxima
           </Button>
-        </Flex >
-       
+        </Flex>
       </div>
     </div>
   );

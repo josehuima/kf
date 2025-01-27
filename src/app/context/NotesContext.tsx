@@ -3,7 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
 type Note = {
-  id: string;
+  temp_uuid: string;
   tipologia: string;
   localizacao: string;
   avaliable: string;
@@ -51,18 +51,18 @@ export const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
 
       const propertiesWithImages = await Promise.all(
         properties.map(async (property: Note) => {
-          console.log(`Buscando fotos para o imóvel ID: ${property.id}`);
+          console.log(`Buscando fotos para o imóvel ID: ${property.temp_uuid}`);
           const { data: photos, error: photoError } = await supabase
             .from("property_photos")
             .select("photo_path")
-            .eq("property_id", property.id.toString());
+            .eq("property_id", property.temp_uuid.toString());
 
           if (photoError) {
-            console.error(`Erro ao buscar fotos para o imóvel ${property.id}:`, photoError);
+            console.error(`Erro ao buscar fotos para o imóvel ${property.temp_uuid}:`, photoError);
             return { ...property, images: ["/default-placeholder.jpg"] };
           }
 
-          console.log(`Fotos encontradas para o imóvel ${property.id}:`, photos);
+          console.log(`Fotos encontradas para o imóvel ${property.temp_uuid}:`, photos);
 
           const images = photos
             .map((photo) => {

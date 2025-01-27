@@ -2,12 +2,12 @@ import { createClient } from "@supabase/supabase-js";
 import { redirect } from "next/navigation";
 import React from "react";
 import Image from "next/image";
-import { Table } from "@radix-ui/themes";
+import { Table, Box, Flex, Text, Card, Button, Separator } from "@radix-ui/themes";
 
 type Imobiliario = {
   id: string;
   descricao: string;
-  fotos: string[] | null; // Permitir que seja null caso esteja vazio
+  fotos: string[] | null;
 };
 
 type Params = {
@@ -15,7 +15,7 @@ type Params = {
 };
 
 async function Page({ params }: Params) {
-  const { stateId } = params;
+  const { stateId } = await params;
 
   // Inicializar Supabase
   const supabase = createClient(
@@ -27,83 +27,112 @@ async function Page({ params }: Params) {
   const { data: notes, error } = await supabase
     .from("imobiliarios")
     .select()
-    .eq("id", stateId);
+    .eq("temp_uuid", stateId);
 
-  // Redirecionar se o item não existir ou ocorrer erro
-  if (!notes || notes.length !== 1 || error) {
-    redirect("/dashboard");
-  }
+    if (error || !notes || notes.length === 0) {
+      return (
+        <Box className="min-h-screen p-8">
+          <Text as="p" size="2" className="text-red-600">
+            Não foi possível carregar os dados do imóvel.
+          </Text>
+        </Box>
+      );
+    }
 
   const imobiliario = notes[0];
-
-  // Garantir que `fotos` é um array válido
   const fotos = Array.isArray(imobiliario.fotos) ? imobiliario.fotos : [];
 
-  // Renderizar os detalhes
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-4">Imóvel - {imobiliario.descricao}</h1>
+    <Box className="min-h-screen p-8 ">
+      <Flex className="max-w-7xl mx-auto flex-col lg:flex-row bg-white rounded-lg shadow-lg overflow-hidden">
+        
+        {/* Seção de Informações do Imóvel */}
+        <Box className="lg:w-3/4 p-6">
+          {/* Título */}
+          <Text size="4" weight="bold" className="text-orange-600 mb-6">
+            {imobiliario.descricao}
+          </Text>
 
-      {/* Galeria de Fotografias */}
-      {fotos.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          {fotos.map((foto: string, index: number) => (
-            <div key={index} className="overflow-hidden rounded-lg shadow-md">
-              <Image
-                src={foto}
-                alt={`Fotografia ${index + 1}`}
-                width={600}
-                height={400}
-                className="object-cover w-full h-full"
-              />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="text-gray-500">Nenhuma fotografia disponível para este imóvel.</p>
-      )}
+          {/* Galeria de Fotos */}
+          {fotos.length > 0 ? (
+            <Flex className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+              {fotos.map((foto: string, index: number) => (
+                <Card key={index} className="overflow-hidden rounded-lg shadow-md transition-shadow hover:shadow-lg">
+                  <Image
+                    src={foto}
+                    alt={`Foto ${index + 1}`}
+                    width={600}
+                    height={400}
+                    className="object-cover w-full h-full"
+                  />
+                </Card>
+              ))}
+            </Flex>
+          ) : (
+            <Text as="p" className="text-gray-500 text-center">
+              Nenhuma fotografia disponível para este imóvel.
+            </Text>
+          )}
 
-      {/* Detalhes do Imóvel */}
-      <div className="bg-white p-6 rounded-lg shadow-md mb-8">
-        <h2 className="text-2xl font-semibold mb-2">Descrição</h2>
-        <p className="text-gray-700 mb-4">{imobiliario.descricao}</p>
-      </div>
+          {/* Detalhes */}
+          <Box className="bg-orange-50 p-6 rounded-lg shadow-md mb-8">
+            <Text  size="2" weight="light" className="mb-4">Detalhes do Imóvel</Text>
+            <Text as="p" size="2" className="text-gray-700">{imobiliario.descricao}</Text>
+          </Box>
 
-      {/* Tabela de Informações */}
-      <Table.Root>
-        <Table.Header>
-          <Table.Row>
-            <Table.ColumnHeaderCell>Descrição</Table.ColumnHeaderCell>
-            <Table.ColumnHeaderCell>Fotos</Table.ColumnHeaderCell>
-          </Table.Row>
-        </Table.Header>
+          {/* Tabela de Informações */}
+          <Box className="overflow-x-auto">
+            <Table.Root className="w-full">
+              <Table.Header>
+                <Table.Row>
+                  <Table.ColumnHeaderCell className="text-left ">Descrição</Table.ColumnHeaderCell>
+                  <Table.ColumnHeaderCell className="text-left">Fotos</Table.ColumnHeaderCell>
+                </Table.Row>
+              </Table.Header>
 
-        <Table.Body>
-          <Table.Row>
-            <Table.RowHeaderCell>{imobiliario.descricao}</Table.RowHeaderCell>
-            <Table.Cell>
-              {fotos.length > 0 ? (
-                <div className="flex space-x-2">
-                  {fotos.slice(0, 3).map((foto, index) => (
-                    <div key={index} className="w-16 h-16 overflow-hidden rounded-lg shadow-md">
-                      <Image
-                        src={foto}
-                        alt={`Foto ${index + 1}`}
-                        width={64}
-                        height={64}
-                        className="object-cover w-full h-full"
-                      />
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <span className="text-gray-500">Sem fotos</span>
-              )}
-            </Table.Cell>
-          </Table.Row>
-        </Table.Body>
-      </Table.Root>
-    </div>
+              <Table.Body>
+                <Table.Row>
+                  <Table.RowHeaderCell>{imobiliario.descricao}</Table.RowHeaderCell>
+                  <Table.Cell>
+                    {fotos.length > 0 ? (
+                      <Flex className="gap-2">
+                        {fotos.slice(0, 3).map((foto: string, index: number) => (
+                          <Box key={index} className="w-16 h-16 overflow-hidden rounded-lg shadow-md">
+                            <Image
+                              src={foto}
+                              alt={`Thumbnail ${index + 1}`}
+                              width={64}
+                              height={64}
+                              className="object-cover w-full h-full"
+                            />
+                          </Box>
+                        ))}
+                      </Flex>
+                    ) : (
+                      <Text as="span" className="text-gray-500">Sem fotos</Text>
+                    )}
+                  </Table.Cell>
+                </Table.Row>
+              </Table.Body>
+            </Table.Root>
+          </Box>
+        </Box>
+
+        {/* Componente Lateral de Contato */}
+        <Separator orientation="vertical" className="hidden lg:block" />
+        <Box className="lg:w-1/4 p-6 bg-orange-50 rounded-lg shadow-md">
+          <Text size="2" weight="bold" className="text-orange-600 mb-4">Contacte-nos</Text>
+          <Text as="p" size="2" className="text-gray-700 mb-4">
+            Para arrendar ou comprar este imóvel, entre em contato conosco:
+          </Text>
+          <Box className="text-lg">
+            <Text as="p" className="mb-2"><strong>Telefone:</strong> +244 912 345 678</Text>
+            <Text as="p" className="mb-2"><strong>Email:</strong> imobiliaria@example.com</Text>
+            <Text as="p" className="mb-2"><strong>Localização:</strong> Av. Principal, 123, Lubango, Huíla, Angola</Text>
+          </Box>
+        </Box>
+      </Flex>
+    </Box>
   );
 }
 
