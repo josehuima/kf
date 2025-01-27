@@ -30,13 +30,8 @@ async function Page({ params }: Params) {
     .eq("temp_uuid", stateId);
 
     if (error || !notes || notes.length === 0) {
-      return (
-        <Box className="min-h-screen p-8">
-          <Text as="p" size="2" className="text-red-600">
-            Não foi possível carregar os dados do imóvel.
-          </Text>
-        </Box>
-      );
+      redirect("/");
+      return null;
     }
 
   const imobiliario = notes[0];
