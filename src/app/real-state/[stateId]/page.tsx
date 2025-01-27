@@ -11,10 +11,19 @@ export type paramsType = Promise<{ stateId: string }>;
 async function Page(props: { params: paramsType }) {
   const { stateId } = await props.params; // Remova o `await` aqui
 
+  const supabaseUrl = process.env.SUPABASE_URL;
+  const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error(
+      "As variáveis de ambiente NEXT_PUBLIC_SUPABASE_URL ou NEXT_PUBLIC_SUPABASE_ANON_KEY não estão definidas."
+    );
+  }
   // Inicializar Supabase
   const supabase = createClient(
-    "https://jqidnghoneocwhtcpbjn.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpxaWRuZ2hvbmVvY3dodGNwYmpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU1NjcyOTUsImV4cCI6MjA1MTE0MzI5NX0.FWrf7O3VNr4RTo7KoeGAuwolsz7koWqEuwza48wsynM"
+    supabaseUrl,
+    supabaseAnonKey
   );
 
   // Consultar os dados

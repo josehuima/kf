@@ -74,13 +74,13 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gradient-to-br">
       <div className="max-w-7xl mx-auto px-6 py-10">
         <header className="text-center mb-10">
-          <Text size="8" weight="bold" color="orange">
+          <Text size="5" weight="bold" color="orange">
             Explore Imóveis Disponíveis
           </Text>
         </header>
 
         {/* Filtros */}
-        <Flex direction="column" gap="4" mb="6">
+        <Flex direction="column" gap="4" mb="9">
           <TextField.Root
             placeholder="Buscar por descrição ou local..."
             size="3"
@@ -168,7 +168,7 @@ export default function DashboardPage() {
           </Grid>
         )}
 
-        <Flex justify="center" align="center" gap="9" mt="10">
+        <Flex align="center" pt="10">
           <Button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
