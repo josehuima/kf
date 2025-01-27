@@ -8,6 +8,17 @@ import { Table, Box, Flex, Text, Card, Button, Separator } from "@radix-ui/theme
 
 export type paramsType = Promise<{ stateId: string }>;
 
+type Note = {
+  temp_uuid: string;
+  tipologia: string;
+  localizacao: string;
+  avaliable: string;
+  preco: number;
+  descricao: string;
+  created_at: string;
+  images: string[]; // Campo para URLs das imagens
+};
+
 async function Page(props: { params: paramsType }) {
   const { stateId } = await props.params; // Remova o `await` aqui
 
@@ -32,6 +43,10 @@ async function Page(props: { params: paramsType }) {
     .select()
     .eq("temp_uuid", stateId);
 
+
+
+   
+
   if (error || !notes || notes.length === 0) {
     return (
       <Box className="min-h-screen p-8">
@@ -42,9 +57,43 @@ async function Page(props: { params: paramsType }) {
     );
   }
 
-  const imobiliario = notes[0];
-  const fotos = Array.isArray(imobiliario.fotos) ? imobiliario.fotos : [];
+  const propertiesWithImages = await Promise.all(
+    notes.map(async (property: Note) => {
+      const { data: photos, error: photoError } = await supabase
+        .from("property_photos")
+        .select("photo_path")
+        .eq("property_id", property.temp_uuid);
+  
+      if (photoError) {
+        return { ...property, images: ["/default-placeholder.jpg"] };
+      }
+  
+      const images = photos
+        .map((photo: any) => {
+          const { data } = supabase.storage
+            .from("kubico-facil")
+            .getPublicUrl(photo.photo_path);
+  
+          return data?.publicUrl || null;
+        })
+        .filter((url: string | null) => url !== null);
+  
+      return {
+        ...property,
+        images: images.length > 0 ? images : ["/326547605_714729620344884_1344181896237920632_n.jpg"],
+      };
+    })
+  );
+  
 
+
+
+
+
+  const imobiliario = propertiesWithImages[0];;
+  const fotos = imobiliario?.images || [];
+
+  console.log('Fotografias encontradas: ',fotos)
   return (
     <Box className="min-h-screen p-8 ">
       <Flex className="max-w-7xl mx-auto flex-col lg:flex-row bg-white rounded-lg shadow-lg overflow-hidden">
