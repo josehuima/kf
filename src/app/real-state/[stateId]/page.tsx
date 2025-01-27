@@ -15,7 +15,7 @@ type Params = {
 };
 
 async function Page({ params }: Params) {
-  const { stateId } = await params;
+  const { stateId } = params;
 
   // Inicializar Supabase
   const supabase = createClient(
