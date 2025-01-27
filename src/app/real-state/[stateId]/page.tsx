@@ -101,7 +101,11 @@ async function Page(props: { params: paramsType }) {
         <Box className="lg:w-3/4 p-6">
           {/* Título */}
           <Text size="4" weight="bold" className="text-orange-600 mb-6">
-            {imobiliario.descricao}
+            {imobiliario.tipologia} - {imobiliario.localizacao} -{" "}
+                  {imobiliario.preco.toLocaleString("pt-BR", {
+                    style: "currency",
+                    currency: "AOA",
+                  })}
           </Text>
 
           {/* Galeria de Fotos */}
@@ -201,7 +205,7 @@ async function Page(props: { params: paramsType }) {
               <strong>Telefone:</strong> +244 912 345 678
             </Text>
             <Text as="p" className="mb-2">
-              <strong>Email:</strong> imobiliaria@example.com
+              <strong>Email:</strong> info@kubico-facil.com
             </Text>
             <Text as="p" className="mb-2">
               <strong>Localização:</strong> Av. Principal, 123, Lubango, Huíla,
