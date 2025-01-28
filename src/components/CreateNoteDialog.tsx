@@ -78,7 +78,7 @@ const CreateNoteDialog = (props: Props) => {
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Nome..."
+            placeholder="Descrição do imovel..."
           />
           <div className="h-4"></div>
           <div className="flex items-center gap-2">

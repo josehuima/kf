@@ -31,9 +31,6 @@ const DashboardPage = async (props: Props) => {
     const supabase = createClient(supabaseUrl,supabaseAnonKey);
     const { data: notes } = await supabase.from("imobiliarios").select().eq('userId', userId);
 
-
-    //console.log('Anucio deste user: ', notes)
-
   return (
     <>
       <div className="grainy min-h-screen">
@@ -61,7 +58,7 @@ const DashboardPage = async (props: Props) => {
           {/* if no notes, display this */}
           {notes?.length === 0 && (
             <div className="text-center">
-              <h2 className="text-xl text-gray-500">Nenhum apontamento encontrado.</h2>
+              <h2 className="text-xl text-gray-500">Nenhum anuncio encontrado.</h2>
             </div>
           )}
 
