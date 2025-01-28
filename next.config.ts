@@ -2,7 +2,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ['jqidnghoneocwhtcpbjn.supabase.co'], // Adicione o domínio do Supabase aqui
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'jqidnghoneocwhtcpbjn.supabase.co',
+        pathname: '**',
+      },
+      ], // Adicione o domínio do Supabase aqui
   },
 };
 

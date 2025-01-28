@@ -23,12 +23,13 @@ const CreateNoteDialog = (props: Props) => {
   const {  userId } = useAuth();
  
 
+
+  console.log('Id do user: ', userId)
   const createNotebook = useMutation({
     mutationFn: async () => {
-      const response = await axios.post("/api/createNoteBook", {
-        name: input,
+      const response = await axios.post("/api/createProjectBook", {
+        descricao: input,
         userId: userId
-       
       });
       return response.data;
     },
@@ -41,11 +42,11 @@ const CreateNoteDialog = (props: Props) => {
       return;
     }
     createNotebook.mutate(undefined, {
-      onSuccess: ({ note_id }) => {
-        console.log("Processo criado com sucesso!:", { note_id });
+      onSuccess: ({ project_id }) => {
+        console.log("Processo criado com sucesso!:", { project_id });
         // hit another endpoint to uplod the temp dalle url to permanent firebase url
        
-        router.push(`/notebook/${note_id}`);
+        router.push(`/notebook/${project_id}`);
       },
       onError: (error) => {
         console.error(error);
