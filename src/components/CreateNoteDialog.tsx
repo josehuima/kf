@@ -17,6 +17,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 type Props = {};
 
+
+
 const CreateNoteDialog = (props: Props) => {
   const router = useRouter();
   const [input, setInput] = React.useState("");

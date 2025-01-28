@@ -13,14 +13,26 @@ import { Button } from "@radix-ui/themes";
 
 type Props = {};
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+
 const DashboardPage = async (props: Props) => {
 
 
   const { userId } = await auth();
 
-    const supabase = createClient('https://iehsmuxjlrzfwordijiy.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImllaHNtdXhqbHJ6ZndvcmRpaml5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDEzMzkzNjcsImV4cCI6MjAxNjkxNTM2N30.8hmf2igDjxqcd6WH0LgxLhhzp1z5ll4TZ1hTEiKYRYM');
-  const { data: notes } = await supabase.from("notes").select().eq('userId', userId);
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error(
+      "As variáveis de ambiente NEXT_PUBLIC_SUPABASE_URL ou NEXT_PUBLIC_SUPABASE_ANON_KEY não estão definidas."
+    );
+  }
 
+    const supabase = createClient(supabaseUrl,supabaseAnonKey);
+    const { data: notes } = await supabase.from("imobiliarios").select().eq('userId', userId);
+
+
+    //console.log('Anucio deste user: ', notes)
 
   return (
     <>
@@ -59,22 +71,22 @@ const DashboardPage = async (props: Props) => {
            
             {notes?.map((note) => {
               return (
-                <a href={`/notebook/${note.id}`} key={note.id}>
+                <a href={`/notebook/${note.temp_uuid}`} key={note.temp_uuid}>
                   <div className="border border-stone-300 rounded-lg overflow-hidden flex flex-col hover:shadow-xl transition hover:-translate-y-1">
                   <Image
                       width={100}
                       height={50}
-                      alt={note.name}
+                      alt={note.descricao}
                       src="notepad.svg"
                     />
                     <div className="p-4">
                       <h3 className="text-xl font-semibold text-gray-900">
-                      {truncateText(note.name, 10)} 
+                      {truncateText(note.descricao, 10)} 
                       </h3>
                       <div className="h-1"></div>
                       <p className="text-sm text-gray-500">
                     
-                       {formatDateDistance(note.criated)}
+                       {formatDateDistance(note.created_at)}
                       </p>
                     </div>
                   </div>
