@@ -30,15 +30,15 @@ const DashboardPage = async (props: Props) => {
           <div className="flex justify-between items-center md:flex-row flex-col">
             <div className="flex items-center">
               <Link href="/">
-                <Button className="bg-green-600" size="3">
+                <Button className="bg-orange-600" size="3">
                   <ArrowLeft className="mr-1 w-4 h-4" />
                   Voltar 
                 </Button>
               </Link>
               <div className="w-4"></div>
-              <h3 className="text-3xl font-bold text-gray-900">Minhas notas</h3>
+              <h4 className=" font-bold  text-orange-900">Meus anuncios</h4>
               <div className="w-4"></div>
-              <UserButton />
+              
             </div>
           </div>
 
