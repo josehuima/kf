@@ -201,13 +201,13 @@ async function Page(props: { params: paramsType }) {
             Para arrendar ou comprar este imóvel, entre em contato conosco:
           </Text>
           <Box className="text-lg">
-            <Text as="p" className="mb-2">
+            <Text as="p" className="mb-2 text-orange-600">
               <strong>Telefone:</strong> +244 912 345 678
             </Text>
-            <Text as="p" className="mb-2">
+            <Text as="p" className="mb-2 text-orange-600">
               <strong>Email:</strong> info@kubico-facil.com
             </Text>
-            <Text as="p" className="mb-2">
+            <Text as="p" className="mb-2 text-orange-600">
               <strong>Localização:</strong> Av. Principal, 123, Lubango, Huíla,
               Angola
             </Text>

@@ -12,7 +12,7 @@ const LogoHeader: React.FC<LogoHeaderProps> = ({
   href = "/",
 }) => {
   return (
-    <header className="flex p-4 bg-orange-200 ml-10">
+    <header className="flex p-4 bg-orange-1000 ml-10">
       <Link href={href} passHref>
         
           <Image src="/logo-kubico-facil.jpg" alt={altText} width={80} height={80} />

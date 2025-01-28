@@ -1,9 +1,15 @@
 import { Theme } from  '@radix-ui/themes'
 import "@radix-ui/themes/styles.css";
 import "./globals.css";
-
 import LogoHeader from './components/parts/LogoHeader';
 import { NotesProvider } from './context/NotesContext';
+import { ClerkProvider } from '@clerk/nextjs';
+import { ptBR } from "@clerk/localizations";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Kubico Fácil",
+};
 
 export default function RootLayout({
   children,
@@ -11,6 +17,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
+    <ClerkProvider localization={ptBR}>
       <html lang="en">
         <body>
         <Theme accentColor="orange" panelBackground="solid" radius="large" scaling="95%" >
@@ -21,6 +28,6 @@ export default function RootLayout({
           </Theme>
         </body>
       </html>
-  
+      </ClerkProvider>
   )
 }
