@@ -158,17 +158,13 @@ export default function DashboardPage() {
     Publicado {formatDateDistance(note.created_at)}
 		</Text>
 	</Flex>
-
-                 
-               
-               
               </Card>
               </Link>
             ))}
           </Grid>
         )}
 
-        <Flex align="center" pt="10">
+        <Flex align="center" pt="9">
           <Button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
