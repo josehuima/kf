@@ -22,6 +22,7 @@ export default function RootLayout({
         <body>
         <Theme accentColor="orange" panelBackground="solid" radius="large" scaling="95%" >
         <LogoHeader />
+        
         <NotesProvider>
         {children}
         </NotesProvider>
