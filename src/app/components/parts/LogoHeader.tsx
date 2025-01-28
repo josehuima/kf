@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import CustomSignIn from "@/components/signIn";
+import CustomSignIn from "@/components/ui/CustomSignIn";
 import { UserButton, SignedOut, SignedIn } from "@clerk/nextjs";
 
 type LogoHeaderProps = {
