@@ -6,6 +6,7 @@ import { NotesProvider } from './context/NotesContext';
 import { ClerkProvider } from '@clerk/nextjs';
 import { ptBR } from "@clerk/localizations";
 import type { Metadata } from "next";
+import Provider from '@/components/Provider';
 
 export const metadata: Metadata = {
   title: "Kubico Fácil",
@@ -18,6 +19,7 @@ export default function RootLayout({
 }) {
   return (
     <ClerkProvider localization={ptBR}>
+      <Provider>
       <html lang="en">
         <body>
         <Theme accentColor="orange" panelBackground="solid" radius="large" scaling="95%" >
@@ -29,6 +31,7 @@ export default function RootLayout({
           </Theme>
         </body>
       </html>
+      </Provider>
       </ClerkProvider>
   )
 }
