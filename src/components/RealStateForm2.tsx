@@ -46,11 +46,16 @@ const RealStateForm: React.FC<RealStateFormProps> = ({ imovel, tipologias, local
     const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
     setPreviews(newPreviews);
 
-    // Limpar URLs quando o componente for desmontado ou quando os arquivos mudarem
+    // Revogar as URLs quando os arquivos mudarem ou o componente for desmontado
     return () => {
       newPreviews.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [selectedFiles]);
+
+  // Função para remover um arquivo selecionado
+  const removeImage = (index: number) => {
+    setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,12 +168,23 @@ const RealStateForm: React.FC<RealStateFormProps> = ({ imovel, tipologias, local
             <p>Arraste e solte algumas imagens aqui, ou clique para selecionar</p>
           )}
         </div>
-        {/* Pré-visualização das Imagens */}
+        {/* Pré-visualização das Imagens com opção de remoção */}
         {previews.length > 0 && (
           <div className="mt-4 grid grid-cols-3 gap-4">
             {previews.map((url, index) => (
               <div key={index} className="relative">
-                <img src={url} alt={`Preview ${index}`} className="w-full h-32 object-cover rounded" />
+                <img
+                  src={url}
+                  alt={`Preview ${index}`}
+                  className="w-full h-32 object-cover rounded"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeImage(index)}
+                  className="absolute top-1 right-1 bg-red-500 text-white px-2 py-1 text-xs rounded"
+                >
+                  Remover
+                </button>
               </div>
             ))}
           </div>
