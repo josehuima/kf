@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { RealState } from "@/lib/db/schema";
+import { Button } from "@radix-ui/themes"
 
 export type Option = {
   id: number;
@@ -178,22 +179,22 @@ const RealStateForm: React.FC<RealStateFormProps> = ({ imovel, tipologias, local
                   alt={`Preview ${index}`}
                   className="w-full h-32 object-cover rounded"
                 />
-                <button
+                <Button
                   type="button"
                   onClick={() => removeImage(index)}
                   className="absolute top-1 right-1 bg-red-500 text-white px-2 py-1 text-xs rounded"
                 >
                   Remover
-                </button>
+                </Button>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
+      <Button type="submit" className="bg-orange-500 text-white px-4 py-2 rounded">
         Salvar
-      </button>
+      </Button>
     </form>
   );
 };
