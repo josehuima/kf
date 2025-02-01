@@ -1,20 +1,12 @@
 "use client";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { RealState } from "@/lib/db/schema";
 
-type Note = {
-  temp_uuid: string;
-  tipologia: string;
-  localizacao: string;
-  avaliable: string;
-  preco: number;
-  descricao: string;
-  created_at: string;
-  images: string[]; // Campo para URLs das imagens
-};
+
 
 type NotesContextType = {
-  notes: Note[] | null;
+  notes: RealState[] | null;
   loading: boolean;
   error: string | null;
   refreshNotes: () => Promise<void>;
@@ -30,7 +22,7 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 export const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
-  const [notes, setNotes] = useState<Note[] | null>(null);
+  const [notes, setNotes] = useState<RealState[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const fetchNotes = async () => {
@@ -53,7 +45,7 @@ export const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
         throw new Error(`Erro ao buscar imóveis: ${error.message}`);
       }
       const propertiesWithImages = await Promise.all(
-        properties.map(async (property: Note) => {
+        properties.map(async (property: RealState) => {
           
           const { data: photos, error: photoError } = await supabase
             .from("property_photos")
