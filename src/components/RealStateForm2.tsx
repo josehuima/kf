@@ -4,7 +4,6 @@
 import React, { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { RealState } from "@/lib/db/schema";
-import { Button } from "@radix-ui/themes"
 
 export type Option = {
   id: number;
@@ -17,17 +16,22 @@ interface RealStateFormProps {
   localizacoes: Option[];
 }
 
-const RealStateForm: React.FC<RealStateFormProps> = ({ imovel, tipologias, localizacoes }) => {
+const RealStateForm: React.FC<RealStateFormProps> = ({
+  imovel,
+  tipologias,
+  localizacoes,
+}) => {
   // Estados dos campos do formulário
   const [tipologiaId, setTipologiaId] = useState<number>(imovel.tipologia.id);
-  const [localizacaoId, setLocalizacaoId] = useState<number>(imovel.localizacao.id);
+  const [localizacaoId, setLocalizacaoId] = useState<number>(
+    imovel.localizacao.id
+  );
   const [avaliable, setAvaliable] = useState(imovel.avaliable);
   const [preco, setPreco] = useState(imovel.preco);
   const [descricao, setDescricao] = useState(imovel.descricao);
 
-  // Estado para armazenar os arquivos selecionados via drag and drop
+  // Estados para imagens
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-  // Estado para armazenar as URLs de pré-visualização dos arquivos
   const [previews, setPreviews] = useState<string[]>([]);
 
   // Configuração do react-dropzone
@@ -38,37 +42,89 @@ const RealStateForm: React.FC<RealStateFormProps> = ({ imovel, tipologias, local
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      "image/*": []
-    }
+      "image/*": [],
+    },
   });
 
-  // Gerar URLs de preview e limpar quando os arquivos forem removidos
   useEffect(() => {
-    const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
+    const newPreviews = selectedFiles.map((file) =>
+      URL.createObjectURL(file)
+    );
     setPreviews(newPreviews);
 
-    // Revogar as URLs quando os arquivos mudarem ou o componente for desmontado
     return () => {
       newPreviews.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [selectedFiles]);
 
-  // Função para remover um arquivo selecionado
   const removeImage = (index: number) => {
     setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Função para converter um arquivo para base64
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        // O resultado é algo como "data:image/jpeg;base64,....."
+        // Retiramos o prefixo para enviar apenas a string base64
+        const result = reader.result as string;
+        const base64 = result.split(",")[1];
+        resolve(base64);
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Aqui você pode implementar a lógica para salvar ou atualizar os dados, incluindo o upload das imagens
-    console.log("Dados enviados:", {
+
+    // Converter os arquivos selecionados para base64
+    const images =
+      selectedFiles.length > 0
+        ? await Promise.all(
+            selectedFiles.map(async (file) => {
+              const base64 = await fileToBase64(file);
+              return {
+                fileName: file.name,
+                base64,
+              };
+            })
+          )
+        : [];
+
+    // Montar o objeto com os dados a serem enviados
+    const payload = {
+      projectId: imovel.temp_uuid,
       tipologiaId,
       localizacaoId,
       avaliable,
       preco,
       descricao,
-      imagens: selectedFiles,
-    });
+      images,
+    };
+
+    try {
+      const response = await fetch("/api/saveNote", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        // Aqui você pode dar um feedback positivo ao usuário (ex: toast, redirecionamento, etc.)
+        alert("Imóvel atualizado com sucesso!");
+      } else {
+        // Caso a resposta não seja OK, trate o erro
+        alert("Erro ao atualizar o imóvel.");
+      }
+    } catch (error) {
+      console.error("Erro ao enviar os dados:", error);
+      alert("Erro ao enviar os dados do imóvel.");
+    }
   };
 
   return (
@@ -179,22 +235,22 @@ const RealStateForm: React.FC<RealStateFormProps> = ({ imovel, tipologias, local
                   alt={`Preview ${index}`}
                   className="w-full h-32 object-cover rounded"
                 />
-                <Button
+                <button
                   type="button"
                   onClick={() => removeImage(index)}
                   className="absolute top-1 right-1 bg-red-500 text-white px-2 py-1 text-xs rounded"
                 >
                   Remover
-                </Button>
+                </button>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      <Button type="submit" className="bg-orange-500 text-white px-4 py-2 rounded">
+      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
         Salvar
-      </Button>
+      </button>
     </form>
   );
 };
