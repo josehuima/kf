@@ -44,7 +44,7 @@ async function Page(props: { params: paramsType }) {
     .eq("temp_uuid", stateId);
 
 
-
+    console.log('Erro encontrado: ', error)
    
 
   if (error || !notes || notes.length === 0) {

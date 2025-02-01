@@ -27,26 +27,15 @@ type NotesProviderProps = {
 };
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-
-console.log('o .env enviou isso: ', supabaseUrl)
-
-
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 export const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
   const [notes, setNotes] = useState<Note[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  
-
-
   const fetchNotes = async () => {
     setLoading(true);
     setError(null);
-
-  
     if (!supabaseUrl || !supabaseAnonKey) {
       throw new Error(
         "As variáveis de ambiente NEXT_PUBLIC_SUPABASE_URL ou NEXT_PUBLIC_SUPABASE_ANON_KEY não estão definidas."
@@ -58,15 +47,11 @@ export const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
         supabaseUrl,
     supabaseAnonKey
       );
-
-      
       const { data: properties, error } = await supabase.from("imobiliarios").select();
 
       if (error) {
         throw new Error(`Erro ao buscar imóveis: ${error.message}`);
       }
-      
-
       const propertiesWithImages = await Promise.all(
         properties.map(async (property: Note) => {
           
@@ -79,30 +64,20 @@ export const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
             
             return { ...property, images: ["/default-placeholder.jpg"] };
           }
-
-          
-
           const images = photos
             .map((photo) => {
               const { data } = supabase.storage
                 .from("kubico-facil")
                 .getPublicUrl(photo.photo_path);
-
-              
-              
               return data?.publicUrl || null;
             })
             .filter((url) => url !== null);
-
           return { ...property, images: images.length > 0 ? images : ["/326547605_714729620344884_1344181896237920632_n.jpg"] };
         })
       );
-
-      
       setNotes(propertiesWithImages);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Erro desconhecido";
-     
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -112,7 +87,6 @@ export const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
   useEffect(() => {
     fetchNotes();
   }, []);
-
   return (
     <NotesContext.Provider
       value={{
@@ -126,13 +100,10 @@ export const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
     </NotesContext.Provider>
   );
 };
-
 export const useNotes = () => {
   const context = useContext(NotesContext);
-
   if (!context) {
     throw new Error("useNotes deve ser usado dentro de um NotesProvider");
   }
-
   return context;
 };

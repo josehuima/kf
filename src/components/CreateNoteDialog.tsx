@@ -15,6 +15,15 @@ import {Button} from "./ui/button"
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+
+import { CheckCheckIcon, ChevronDownIcon,ChevronUpIcon } from "lucide-react";
 type Props = {};
 
 
@@ -75,6 +84,17 @@ const CreateNoteDialog = (props: Props) => {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
+        <Select>
+  <SelectTrigger className="w-[180px]">
+    <SelectValue placeholder="Theme" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="light">Light</SelectItem>
+    <SelectItem value="dark">Dark</SelectItem>
+    <SelectItem value="system">System</SelectItem>
+  </SelectContent>
+</Select>
+
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
