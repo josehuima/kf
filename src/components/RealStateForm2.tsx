@@ -1,9 +1,9 @@
-// components/RealStateForm.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { RealState } from "@/lib/db/schema";
+import * as RadixProgress from "@radix-ui/react-progress";
 
 export type Option = {
   id: number;
@@ -30,13 +30,24 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
   const [preco, setPreco] = useState(imovel.preco);
   const [descricao, setDescricao] = useState(imovel.descricao);
 
-  // Estados para imagens
+  // Estados para imagens novas
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<number[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Estados para imagens já salvas
+  const [existingImages, setExistingImages] = useState<string[]>(imovel.images || []);
+  // Se necessário, armazene as imagens removidas para enviar ao backend e deletar do Storage/DB
+  const [removedExistingImages, setRemovedExistingImages] = useState<string[]>([]);
 
   // Configuração do react-dropzone
   const onDrop = (acceptedFiles: File[]) => {
     setSelectedFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
+    setUploadProgress((prev) => [
+      ...prev,
+      ...acceptedFiles.map(() => 0),
+    ]);
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -59,6 +70,15 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
 
   const removeImage = (index: number) => {
     setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    setUploadProgress((prev) => prev.filter((_, i) => i !== index));
+    setPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingImage = (index: number) => {
+    // Armazena a URL (ou outra informação de identificação) da imagem removida
+    setRemovedExistingImages((prev) => [...prev, existingImages[index]]);
+    // Remove da lista de imagens já salvas
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   // Função para converter um arquivo para base64
@@ -67,24 +87,43 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => {
-        // O resultado é algo como "data:image/jpeg;base64,....."
-        // Retiramos o prefixo para enviar apenas a string base64
         const result = reader.result as string;
-        const base64 = result.split(",")[1];
+        const base64 = result.split(",")[1]; // remove o prefixo
         resolve(base64);
       };
       reader.onerror = (error) => reject(error);
     });
   };
 
+  // Função para simular o upload de um arquivo, atualizando o progresso
+  const simulateUpload = (fileIndex: number): Promise<void> => {
+    return new Promise((resolve) => {
+      let progress = 0;
+      const interval = setInterval(() => {
+        progress += 10;
+        setUploadProgress((prev) => {
+          const newProgress = [...prev];
+          newProgress[fileIndex] = progress;
+          return newProgress;
+        });
+        if (progress >= 100) {
+          clearInterval(interval);
+          resolve();
+        }
+      }, 200);
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsUploading(true);
 
-    // Converter os arquivos selecionados para base64
-    const images =
+    // Se houver arquivos novos, simula o upload e converte cada um para base64
+    const newImages =
       selectedFiles.length > 0
         ? await Promise.all(
-            selectedFiles.map(async (file) => {
+            selectedFiles.map(async (file, index) => {
+              await simulateUpload(index);
               const base64 = await fileToBase64(file);
               return {
                 fileName: file.name,
@@ -94,7 +133,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
           )
         : [];
 
-    // Montar o objeto com os dados a serem enviados
+    // Monta o objeto com os dados a serem enviados
     const payload = {
       projectId: imovel.temp_uuid,
       tipologiaId,
@@ -102,7 +141,9 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
       avaliable,
       preco,
       descricao,
-      images,
+      newImages, // imagens novas a serem salvas
+      // Envia também as imagens removidas para que o backend possa removê-las do Storage/DB
+      removedImages: removedExistingImages,
     };
 
     try {
@@ -115,15 +156,15 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
       });
 
       if (response.ok) {
-        // Aqui você pode dar um feedback positivo ao usuário (ex: toast, redirecionamento, etc.)
         alert("Imóvel atualizado com sucesso!");
       } else {
-        // Caso a resposta não seja OK, trate o erro
         alert("Erro ao atualizar o imóvel.");
       }
     } catch (error) {
       console.error("Erro ao enviar os dados:", error);
       alert("Erro ao enviar os dados do imóvel.");
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -209,9 +250,9 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
         />
       </div>
 
-      {/* Área de Drag and Drop para Imagens */}
+      {/* Área de Drag and Drop para Imagens Novas */}
       <div>
-        <label className="block font-medium mb-2">Imagens do Imóvel</label>
+        <label className="block font-medium mb-2">Imagens do Imóvel (novas)</label>
         <div
           {...getRootProps()}
           className={`border-dashed border-2 p-4 text-center cursor-pointer ${
@@ -222,10 +263,13 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
           {isDragActive ? (
             <p>Solte os arquivos aqui...</p>
           ) : (
-            <p>Arraste e solte algumas imagens aqui, ou clique para selecionar</p>
+            <p>
+              Arraste e solte algumas imagens aqui, ou clique para selecionar
+            </p>
           )}
         </div>
-        {/* Pré-visualização das Imagens com opção de remoção */}
+
+        {/* Pré-visualização das Imagens Novas com opção de remoção */}
         {previews.length > 0 && (
           <div className="mt-4 grid grid-cols-3 gap-4">
             {previews.map((url, index) => (
@@ -246,10 +290,62 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
             ))}
           </div>
         )}
+
+        {/* Barras de Progresso para cada nova imagem */}
+        {selectedFiles.length > 0 && (
+          <div className="mt-4 space-y-2">
+            {selectedFiles.map((file, index) => (
+              <div key={index}>
+                <p className="text-sm">
+                  {file.name} - {uploadProgress[index] || 0}%
+                </p>
+                <RadixProgress.Root
+                  value={uploadProgress[index] || 0}
+                  max={100}
+                  className="h-4 w-full overflow-hidden rounded bg-gray-200"
+                >
+                  <RadixProgress.Indicator
+                    style={{ width: `${uploadProgress[index] || 0}%` }}
+                    className="h-full bg-blue-500 transition-all"
+                  />
+                </RadixProgress.Root>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-        Salvar
+      {/* Área para exibir e remover as imagens já salvas */}
+      {existingImages.length > 0 && (
+        <div className="mt-4">
+          <h3 className="text-lg font-medium">Imagens já salvas</h3>
+          <div className="mt-2 grid grid-cols-3 gap-4">
+            {existingImages.map((url, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={url}
+                  alt={`Imagem ${index}`}
+                  className="w-full h-32 object-cover rounded"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeExistingImage(index)}
+                  className="absolute top-1 right-1 bg-red-500 text-white px-2 py-1 text-xs rounded"
+                >
+                  Remover
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <button
+        type="submit"
+        className="bg-blue-500 text-white px-4 py-2 rounded"
+        disabled={isUploading}
+      >
+        {isUploading ? "Enviando..." : "Salvar"}
       </button>
     </form>
   );

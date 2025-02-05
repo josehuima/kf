@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { sanitizeFileName } from "@/lib/utils"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -79,8 +80,10 @@ export async function POST(req: Request) {
         const { fileName, base64 } = image;
         if (!fileName || !base64) continue;
 
+        const safeFileName = sanitizeFileName(fileName)
+
         // Define o caminho da pasta como "imoveis/<temp_uuid>/"
-        const filePath = `imoveis/${projectId}/${fileName}`;
+        const filePath = `imoveis/${projectId}/${safeFileName}`;
 
         // Converte a string base64 para um Buffer
         const buffer = Buffer.from(base64, "base64");
