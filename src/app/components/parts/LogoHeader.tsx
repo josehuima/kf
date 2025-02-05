@@ -1,7 +1,9 @@
-"use client"
+"use client";
+
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import CustomSignOutButton from "@/components/ui/CustomSignOutButton";
 import CustomSignIn from "@/components/ui/CustomSignIn";
 import { UserButton, SignedOut, SignedIn } from "@clerk/nextjs";
 import { Menu, X } from "lucide-react";
@@ -24,7 +26,7 @@ const LogoHeader: React.FC<LogoHeaderProps> = ({
         <Image src="/logo-kubico-facil.jpg" alt={altText} width={80} height={80} />
       </Link>
 
-      {/* Ícone do menu hambúrguer - visível apenas em telas pequenas */}
+      {/* Ícone do menu hambúrguer - aparece apenas em telas pequenas */}
       <button
         className="md:hidden text-white"
         onClick={() => setMenuOpen(!menuOpen)}
@@ -34,23 +36,42 @@ const LogoHeader: React.FC<LogoHeaderProps> = ({
 
       {/* Menu (responsivo) */}
       <nav
-        className={`absolute top-16 right-4 bg-white shadow-lg rounded-lg p-4 md:p-0 md:static md:flex md:items-center transition-transform ${
+        className={`absolute top-16 right-4 bg-white shadow-lg rounded-lg p-4 space-y-2 md:p-0 md:static md:flex md:items-center md:space-x-6 transition-transform ${
           menuOpen ? "block" : "hidden"
         } md:block`}
       >
-        <SignedOut>
-          <CustomSignIn />
-        </SignedOut>
+        <Link
+          href="/"
+          className="block px-4 py-2 text-orange-600 hover:text-orange-800 md:inline"
+        >
+          Página Inicial
+        </Link>
+
         <SignedIn>
           <Link
             href="/dashboard"
-            className="block px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-700 md:inline"
+            className="block px-4 py-2 text-orange-600 hover:text-orange-800 md:inline"
           >
             Dashboard
           </Link>
+
+          {/* Botão "Terminar Sessão" apenas em telas pequenas */}
+          <div className="block md:hidden">
+            <CustomSignOutButton />
+          </div>
+        </SignedIn>
+
+        <SignedOut>
+          <CustomSignIn />
+        </SignedOut>
+      </nav>
+
+      {/* Avatar do usuário (fixo à direita) */}
+      <div className="hidden md:block">
+        <SignedIn>
           <UserButton />
         </SignedIn>
-      </nav>
+      </div>
     </header>
   );
 };
