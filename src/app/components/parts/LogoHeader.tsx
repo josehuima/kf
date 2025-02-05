@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import CustomSignOutButton from "@/components/ui/CustomSignOutButton";
@@ -18,6 +18,11 @@ const LogoHeader: React.FC<LogoHeaderProps> = ({
   href = "/",
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Fechar menu automaticamente ao sair da sessão
+  useEffect(() => {
+    setMenuOpen(false);
+  }, []);
 
   return (
     <header className="flex items-center justify-between p-4 bg-orange-600">
@@ -38,11 +43,11 @@ const LogoHeader: React.FC<LogoHeaderProps> = ({
       <nav
         className={`absolute top-16 right-4 bg-white shadow-lg rounded-lg p-4 space-y-2 md:p-0 md:static md:flex md:items-center md:space-x-6 transition-transform ${
           menuOpen ? "block" : "hidden"
-        } md:block`}
+        } md:flex`}
       >
         <Link
           href="/"
-          className="block px-4 py-2 text-orange-600 hover:text-orange-800 md:inline"
+          className="block px-4 py-2 text-orange-600 hover:text-orange-800"
         >
           Página Inicial
         </Link>
@@ -50,7 +55,7 @@ const LogoHeader: React.FC<LogoHeaderProps> = ({
         <SignedIn>
           <Link
             href="/dashboard"
-            className="block px-4 py-2 text-orange-600 hover:text-orange-800 md:inline"
+            className="block px-4 py-2 text-orange-600 hover:text-orange-800"
           >
             Dashboard
           </Link>
@@ -62,7 +67,10 @@ const LogoHeader: React.FC<LogoHeaderProps> = ({
         </SignedIn>
 
         <SignedOut>
-          <CustomSignIn />
+          {/* O botão de login sempre aparecerá corretamente sem sobreposição */}
+          <div className="block">
+            <CustomSignIn />
+          </div>
         </SignedOut>
       </nav>
 
