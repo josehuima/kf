@@ -102,7 +102,7 @@ const NoteBookPage = async (props: { params: paramsType }) => {
 
   return (
     <div className="border-stone-200 shadow-xl border rounded-lg px-16 py-8 w-full">
-      <h1 className="text-2xl font-bold mb-6">Editar Imóvel</h1>
+      <h1 className="text-2xl text-orange-600 font-bold mb-6">Editar Imóvel</h1>
       <RealStateForm
         imovel={imovel}
         tipologias={tipologias}

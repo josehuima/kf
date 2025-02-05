@@ -43,7 +43,7 @@ const DeleteNoteButton: React.FC<DeleteNoteButtonProps> = ({ noteId }) => {
 
   return (
     <Button
-      variant="classic"
+      variant="ghost"
       onClick={handleDelete}
       disabled={isDeleting}
       size="2"

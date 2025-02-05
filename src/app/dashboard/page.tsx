@@ -47,7 +47,7 @@ const DashboardPage = async (props: Props) => {
               <div className="w-4"></div>
               <h4 className="font-bold text-orange-900">Meus anúncios</h4>
             </div>
-            <UserButton />
+            
           </div>
 
           <div className="h-8"></div>

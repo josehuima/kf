@@ -173,7 +173,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Campo Tipologia */}
       <div>
-        <label htmlFor="tipologia" className="block font-medium">
+        <label htmlFor="tipologia" className="block text-orange-600 font-medium">
           Tipologia
         </label>
         <select
@@ -192,7 +192,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
 
       {/* Campo Localização */}
       <div>
-        <label htmlFor="localizacao" className="block font-medium">
+        <label htmlFor="localizacao" className="block text-orange-600 font-medium">
           Localização
         </label>
         <select
@@ -209,32 +209,11 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
         </select>
       </div>
 
-      {/* Campo Disponibilidade */}
-      <div>
-        <label htmlFor="avaliable" className="block font-medium">
-          Disponibilidade
-        </label>
-        
-         <select
-          id="avaliable"
-          value={avaliable}
-          onChange={(e) => setAvaliable(e.target.value)}
-          className="w-full border p-2 rounded"
-        >
-          
-            <option value="1">
-             Disponivel
-            </option>
-            <option value="1">
-             Ocupada
-            </option>
-          
-        </select>
-      </div>
+
 
       {/* Campo Preço */}
       <div>
-        <label htmlFor="preco" className="block font-medium">
+        <label htmlFor="preco" className="block text-orange-600 font-medium">
           Preço
         </label>
         <input
@@ -248,7 +227,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
 
       {/* Campo Descrição */}
       <div>
-        <label htmlFor="descricao" className="block font-medium">
+        <label htmlFor="descricao" className="block text-orange-600 font-medium">
           Descrição
         </label>
         <textarea
@@ -262,10 +241,10 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
 
       {/* Área de Drag and Drop para Imagens Novas */}
       <div>
-        <label className="block font-medium mb-2">Imagens do Imóvel (novas)</label>
+        <label className="block text-orange-600 font-medium mb-2">Imagens do Imóvel (novas)</label>
         <div
           {...getRootProps()}
-          className={`border-dashed border-2 p-4 text-center cursor-pointer ${
+          className={`border-dashed border-2 border-orange-600 text-orange-600 p-4 text-center cursor-pointer ${
             isDragActive ? "bg-gray-200" : "bg-white"
           }`}
         >
@@ -328,7 +307,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
       {/* Área para exibir e remover as imagens já salvas */}
       {existingImages.length > 0 && (
         <div className="mt-4">
-          <h3 className="text-lg font-medium">Imagens já salvas</h3>
+          <h3 className="text-lg text-orange-600 font-medium">Imagens já salvas</h3>
           <div className="mt-2 grid grid-cols-3 gap-4">
             {existingImages.map((url, index) => (
               <div key={index} className="relative">
@@ -350,13 +329,13 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
         </div>
       )}
 
-      <button
+      <Button
         type="submit"
-        className="bg-blue-500 text-white px-4 py-2 rounded"
+        className="bg-orange-500 text-white px-4 py-2 rounded"
         disabled={isUploading}
       >
         {isUploading ? "Enviando..." : "Salvar"}
-      </button>
+      </Button>
     </form>
   );
 };
