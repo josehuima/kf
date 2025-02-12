@@ -59,20 +59,17 @@ const CreateNoteDialog = (props: Props) => {
    useEffect(() => {
     const fetchData = async () => {
       const { data: tipologiasData, error: tipologiaError } = await supabase
-        .from("tipologia")
+        .from("Natureza")
         .select("*");
-      const { data: localizacoesData, error: localizacaoError } = await supabase
-        .from("localizacao")
-        .select("*");
-
-      if (tipologiaError || localizacaoError) {
+      
+      if (tipologiaError) {
         console.error("Erro ao carregar os dados");
         setLoading(false);
         return;
       }
 
       setTipologias(tipologiasData.map((t: any) => ({ id: t.id, name: t.name })));
-      setLocalizacoes(localizacoesData.map((l: any) => ({ id: l.id, name: l.name })));
+      
       setLoading(false);
     };
 
@@ -83,10 +80,9 @@ const CreateNoteDialog = (props: Props) => {
   const createNotebook = useMutation({
     mutationFn: async () => {
       const response = await axios.post("/api/createProjectBook", {
-        descricao: input,
         userId,
-        tipologia: selectedTipologia,
-        localizacao: selectedLocalizacao,
+        natureza: selectedTipologia,
+        
       });
       return response.data;
     },
@@ -95,11 +91,8 @@ const CreateNoteDialog = (props: Props) => {
   // 🔹 Envio do formulário
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!input) {
-      window.alert("Por favor digite a descrição do imóvel.");
-      return;
-    }
-    if (!selectedTipologia || !selectedLocalizacao) {
+    
+    if (!selectedTipologia) {
       window.alert("Por favor selecione a tipologia e localização.");
       return;
     }
@@ -143,7 +136,7 @@ const CreateNoteDialog = (props: Props) => {
           {/* 🔹 Seleção de Tipologia */}
           <Select onValueChange={setSelectedTipologia}>
             <SelectTrigger className="w-full">
-              <SelectValue>{selectedTipologia || "Selecione a tipologia"}</SelectValue>
+            <SelectValue placeholder={selectedTipologia || "Selecione a tipologia"} />
             </SelectTrigger>
             <SelectContent>
               {tipologias.map((tipologia) => (
@@ -153,33 +146,8 @@ const CreateNoteDialog = (props: Props) => {
               ))}
             </SelectContent>
           </Select>
-
           <div className="h-4"></div>
-
-          {/* 🔹 Seleção de Localização */}
-          <Select onValueChange={setSelectedLocalizacao}>
-            <SelectTrigger className="w-full">
-              <SelectValue>{selectedLocalizacao || "Selecione a localização"}</SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {localizacoes.map((localizacao) => (
-                <SelectItem key={localizacao.id} value={localizacao.id.toString()}>
-                  {localizacao.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <div className="h-4"></div>
-
-          {/* 🔹 Campo de entrada */}
-          <Input size={10}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Descrição do imóvel..."
-          />
-          
-          <div className="h-4"></div>
+       <div className="h-4"></div>
           <div className="flex items-center gap-2">
             <Button type="reset" variant="destructive">
               Cancelar

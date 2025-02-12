@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
-import { RealState } from "@/lib/db/schema";
 import * as RadixProgress from "@radix-ui/react-progress";
 import { Button } from "@radix-ui/themes";
+import { RealState } from "@/lib/db/schema";
 
 export type Option = {
   id: number;
@@ -15,34 +15,80 @@ interface RealStateFormProps {
   imovel: RealState;
   tipologias: Option[];
   localizacoes: Option[];
+  naturezas: Option[];
+  quintalCerts: Option[];
+  realStateTypes: Option[];
+  energyCerts: Option[];
+  waterCerts: Option[];
 }
 
 const RealStateForm: React.FC<RealStateFormProps> = ({
   imovel,
   tipologias,
   localizacoes,
+  naturezas,
+  quintalCerts,
+  realStateTypes,
+  energyCerts,
+  waterCerts,
 }) => {
-  // Estados dos campos do formulário
-  const [tipologiaId, setTipologiaId] = useState<number>(imovel.tipologia.id);
-  const [localizacaoId, setLocalizacaoId] = useState<number>(
-    imovel.localizacao.id
+  // Estados para os campos já existentes
+  const [tipologiaId, setTipologiaId] = useState<string>(
+    imovel.tipologia?.id?.toString() ?? ''
   );
-  const [avaliable, setAvaliable] = useState(imovel.avaliable);
-  const [preco, setPreco] = useState(imovel.preco);
-  const [descricao, setDescricao] = useState(imovel.descricao);
-
-  // Estados para imagens novas
+  
+  const [localizacaoId, setLocalizacaoId] = useState<number | string>(
+    imovel.localizacao?.id
+  );
+  
+  const [avaliable, setAvaliable] = useState(
+    imovel.avaliable
+  );
+  
+  const [preco, setPreco] = useState(
+    imovel.preco
+  );
+  
+  const [descricao, setDescricao] = useState<string>(
+    imovel.descricao
+  );
+  
+  const [bairro, setBairro] = useState<string>(
+    imovel.bairro
+  );
+  
+  const [pontoReferencia, setPontoReferencia] = useState<string>(
+    imovel.pontoReferencia
+  );
+  
+  const [naturezaId, setNaturezaId] = useState<number | string>(
+    imovel.natureza?.id
+  );
+  
+  const [quintalId, setQuintalId] = useState<number | string>(
+    imovel.quintal?.id
+  );
+  
+  const [realStateTypeId, setRealStateTypeId] = useState<number | string>(
+    imovel.realStateType?.id
+  );
+  
+  const [energyCertId, setEnergyCertId] = useState<number | string>(imovel.energyCert?.id
+  );
+  
+const [waterCertId, setWaterCertId] = useState<number | string>(imovel.waterCert?.id);
+  
+  // Estados para upload de novas imagens
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [uploadProgress, setUploadProgress] = useState<number[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Estados para imagens já salvas
+  // Estados para as imagens já salvas
   const [existingImages, setExistingImages] = useState<string[]>(imovel.images || []);
-  // Se necessário, armazene as imagens removidas para enviar ao backend e deletar do Storage/DB
   const [removedExistingImages, setRemovedExistingImages] = useState<string[]>([]);
 
-  // Configuração do react-dropzone
+  // Configuração do dropzone
   const onDrop = (acceptedFiles: File[]) => {
     setSelectedFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
     setUploadProgress((prev) => [
@@ -76,13 +122,11 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
   };
 
   const removeExistingImage = (index: number) => {
-    // Armazena a URL (ou outra informação de identificação) da imagem removida
     setRemovedExistingImages((prev) => [...prev, existingImages[index]]);
-    // Remove da lista de imagens já salvas
     setExistingImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // Função para converter um arquivo para base64
+  // Converte arquivo para Base64
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -96,7 +140,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
     });
   };
 
-  // Função para simular o upload de um arquivo, atualizando o progresso
+  // Simula upload atualizando o progresso
   const simulateUpload = (fileIndex: number): Promise<void> => {
     return new Promise((resolve) => {
       let progress = 0;
@@ -119,7 +163,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
     e.preventDefault();
     setIsUploading(true);
 
-    // Se houver arquivos novos, simula o upload e converte cada um para base64
+    // Upload e conversão para base64 de novas imagens, se houver
     const newImages =
       selectedFiles.length > 0
         ? await Promise.all(
@@ -134,18 +178,25 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
           )
         : [];
 
-    // Monta o objeto com os dados a serem enviados
+    // Monta o payload com os dados do formulário
     const payload = {
       projectId: imovel.temp_uuid,
-      tipologiaId,
-      localizacaoId,
-      avaliable,
-      preco,
-      descricao,
-      newImages, // imagens novas a serem salvas
-      // Envia também as imagens removidas para que o backend possa removê-las do Storage/DB
-      removedImages: removedExistingImages,
+      tipologiaId: tipologiaId === '' ? null : Number(tipologiaId),
+      localizacaoId: localizacaoId === '' ? null : localizacaoId,
+      avaliable: avaliable === '' ? null : avaliable,
+      preco: preco,
+      descricao: descricao === '' ? null : descricao,
+      bairro: bairro === '' ? null : bairro,
+      naturezaId: naturezaId === '' ? null : naturezaId,
+      quintalId: quintalId === '' ? null : quintalId,
+      pontoReferencia: pontoReferencia === '' ? null : pontoReferencia,
+      energyCertId: energyCertId === '' ? null : energyCertId,
+      waterCertId: waterCertId === '' ? null : waterCertId,
+      realStateTypeId: realStateTypeId === '' ? null : realStateTypeId,
+      newImages, // Novas imagens para salvar
+      removedImages: removedExistingImages, // Imagens removidas para exclusão no backend
     };
+  
 
     try {
       const response = await fetch("/api/saveNote", {
@@ -169,9 +220,11 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
     }
   };
 
+  console.log('Localizaçao id: ', localizacaoId);
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Campo Tipologia */}
+      {/* Tipologia */}
       <div>
         <label htmlFor="tipologia" className="block text-orange-600 font-medium">
           Tipologia
@@ -179,18 +232,18 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
         <select
           id="tipologia"
           value={tipologiaId}
-          onChange={(e) => setTipologiaId(Number(e.target.value))}
+          onChange={(e) => setTipologiaId(e.target.value)}
           className="w-full border p-2 rounded"
         >
           {tipologias.map((t) => (
-            <option key={t.id} value={t.id}>
+            <option key={t.id} value={t.id.toString()}>
               {t.name}
             </option>
           ))}
         </select>
       </div>
 
-      {/* Campo Localização */}
+      {/* Localização */}
       <div>
         <label htmlFor="localizacao" className="block text-orange-600 font-medium">
           Localização
@@ -209,9 +262,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
         </select>
       </div>
 
-
-
-      {/* Campo Preço */}
+      {/* Preço */}
       <div>
         <label htmlFor="preco" className="block text-orange-600 font-medium">
           Preço
@@ -225,7 +276,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
         />
       </div>
 
-      {/* Campo Descrição */}
+      {/* Descrição */}
       <div>
         <label htmlFor="descricao" className="block text-orange-600 font-medium">
           Descrição
@@ -237,6 +288,143 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
           className="w-full border p-2 rounded"
           rows={4}
         />
+      </div>
+
+      {/* Data de Criação (apenas exibição) */}
+      <div>
+        <label htmlFor="created_at" className="block text-orange-600 font-medium">
+          Data de Criação
+        </label>
+        <input
+          id="created_at"
+          type="text"
+          value={imovel.created_at}
+          disabled
+          className="w-full border p-2 rounded bg-gray-100"
+        />
+      </div>
+
+      {/* Bairro */}
+      <div>
+        <label htmlFor="bairro" className="block text-orange-600 font-medium">
+          Bairro
+        </label>
+        <input
+          id="bairro"
+          type="text"
+          value={bairro}
+          onChange={(e) => setBairro(e.target.value)}
+          className="w-full border p-2 rounded"
+        />
+      </div>
+
+      {/* Ponto de Referência */}
+      <div>
+        <label htmlFor="pontoReferencia" className="block text-orange-600 font-medium">
+          Ponto de Referência
+        </label>
+        <input
+          id="pontoReferencia"
+          type="text"
+          value={pontoReferencia}
+          onChange={(e) => setPontoReferencia(e.target.value)}
+          className="w-full border p-2 rounded"
+        />
+      </div>
+
+      {/* Natureza */}
+      <div>
+        <label htmlFor="natureza" className="block text-orange-600 font-medium">
+          Natureza
+        </label>
+        <select
+          id="natureza"
+          value={naturezaId}
+          onChange={(e) => setNaturezaId(Number(e.target.value))}
+          className="w-full border p-2 rounded"
+        >
+          {naturezas.map((n) => (
+            <option key={n.id} value={n.id}>
+              {n.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Quintal */}
+      <div>
+        <label htmlFor="quintal" className="block text-orange-600 font-medium">
+          Quintal
+        </label>
+        <select
+          id="quintal"
+          value={quintalId}
+          onChange={(e) => setQuintalId(Number(e.target.value))}
+          className="w-full border p-2 rounded"
+        >
+          {quintalCerts.map((q) => (
+            <option key={q.id} value={q.id}>
+              {q.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Tipo de Imóvel */}
+      <div>
+        <label htmlFor="realStateType" className="block text-orange-600 font-medium">
+          Tipo de Imóvel
+        </label>
+        <select
+          id="realStateType"
+          value={realStateTypeId}
+          onChange={(e) => setRealStateTypeId(Number(e.target.value))}
+          className="w-full border p-2 rounded"
+        >
+          {realStateTypes.map((rt) => (
+            <option key={rt.id} value={rt.id}>
+              {rt.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Certificação de Energia */}
+      <div>
+        <label htmlFor="energyCert" className="block text-orange-600 font-medium">
+          Certificação de Energia
+        </label>
+        <select
+          id="energyCert"
+          value={energyCertId}
+          onChange={(e) => setEnergyCertId(Number(e.target.value))}
+          className="w-full border p-2 rounded"
+        >
+          {energyCerts.map((ec) => (
+            <option key={ec.id} value={ec.id}>
+              {ec.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Certificação de Água */}
+      <div>
+        <label htmlFor="waterCert" className="block text-orange-600 font-medium">
+          Certificação de Água
+        </label>
+        <select
+          id="waterCert"
+          value={waterCertId}
+          onChange={(e) => setWaterCertId(Number(e.target.value))}
+          className="w-full border p-2 rounded"
+        >
+          {waterCerts.map((wc) => (
+            <option key={wc.id} value={wc.id}>
+              {wc.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Área de Drag and Drop para Imagens Novas */}

@@ -22,7 +22,7 @@ const NoteBookPage = async (props: { params: paramsType }) => {
 
   // Consulta dos dados do imóvel
   const { data: notes, error } = await supabase
-    .from("imobiliarios")
+    .from("imo")
     .select()
     .eq("temp_uuid", projectId);
 
@@ -79,7 +79,29 @@ const NoteBookPage = async (props: { params: paramsType }) => {
     .from("localizacao")
     .select("*");
 
-  if (tipologiaError || !tipologiasData || localizacaoError || !localizacoesData) {
+    const { data: naturezaData, error: naturezaError } = await supabase
+    .from("Natureza")
+    .select("*");
+
+    const { data: quintalData, error: quintalError } = await supabase
+    .from("QuintalCert")
+    .select("*");
+    const { data: realStateTypeData, error: realStateTypeError } = await supabase
+    .from("RealStateType")
+    .select("*");
+
+    const { data: energyCertsData, error: energyCertsError } = await supabase
+    .from("EnergyCert")
+    .select("*");
+
+    const { data: waterCertsData, error: waterCertsError } = await supabase
+    .from("WaterCert")
+    .select("*");
+
+
+    
+
+  if (tipologiaError || !tipologiasData || localizacaoError || !localizacoesData || naturezaError || !naturezaData || quintalError || !quintalData || realStateTypeError || !realStateTypeData || energyCertsError || !energyCertsData || waterCertsError || !waterCertsData) {
     return (
       <Box className="min-h-screen p-8">
         <Text as="p" size="2" className="text-red-600">
@@ -99,6 +121,33 @@ const NoteBookPage = async (props: { params: paramsType }) => {
     id: l.id,
     name: l.name,
   }));
+  const naturezas: Option[] = naturezaData.map((l: any) => ({
+    id: l.id,
+    name: l.name,
+  }));
+
+  const quintalCerts: Option[] = quintalData.map((l: any) => ({
+    id: l.id,
+    name: l.name,
+  }));  
+
+  const realStateTypes: Option[] = realStateTypeData.map((l: any) => ({
+    id: l.id,
+    name: l.name,
+  }));
+
+  const energyCerts: Option[] = energyCertsData.map((l: any) => ({
+    id: l.id,
+    name: l.name,
+  }));
+
+  const waterCerts: Option[] = waterCertsData.map((l: any) => ({
+    id: l.id,
+    name: l.name,
+  }));
+
+
+  console.log('Tipologias encontrado: ', tipologias)
 
   return (
     <div className="border-stone-200 shadow-xl border rounded-lg px-16 py-8 w-full">
@@ -107,6 +156,11 @@ const NoteBookPage = async (props: { params: paramsType }) => {
         imovel={imovel}
         tipologias={tipologias}
         localizacoes={localizacoes}
+        naturezas={naturezas}
+        quintalCerts={quintalCerts}
+        realStateTypes={realStateTypes} 
+        energyCerts={energyCerts}
+        waterCerts={waterCerts}
       />
     </div>
   );

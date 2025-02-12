@@ -39,8 +39,18 @@ export async function POST(req: Request) {
       avaliable,
       preco,
       descricao,
+      bairro,
+      naturezaId,
+      quintalId,
+      pontoReferencia,
+      energyCertId,
+      waterCertId,
+      realStateTypeId,
       images // array de objetos: { fileName: string, base64: string }
     } = body;
+
+
+    console.log('Dados do body:', body);
 
     // Validação simples
     if (!projectId) {
@@ -61,11 +71,18 @@ export async function POST(req: Request) {
     const { error: updateError } = await supabase
       .from("imoveis")
       .update({
-        tipologia_id: tipologiaId,
-        localizacao_id: localizacaoId,
-        avaliable,
-        preco,
-        descricao
+        'tipologia': tipologiaId,
+        'localizacao': localizacaoId,
+        'avaliable': avaliable,
+        'preco': preco,
+        'descricao': descricao,
+        'bairro': bairro,
+        'natureza': naturezaId,
+        'quintal': quintalId,
+        'pontoReferencia': pontoReferencia,
+        'energyCert': energyCertId,
+        'waterCert': waterCertId,
+        'realStateType': realStateTypeId
       })
       .eq("temp_uuid", projectId);
 
