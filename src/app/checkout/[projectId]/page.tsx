@@ -63,7 +63,7 @@ const CheckoutPage: React.FC = () => {
         </p>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="name" className="block mb-1 font-semibold">
+            <label htmlFor="name" className="block text-orange-500 mb-1 font-semibold">
               Nome
             </label>
             <input
@@ -76,7 +76,7 @@ const CheckoutPage: React.FC = () => {
             />
           </div>
           <div>
-            <label htmlFor="email" className="block mb-1 font-semibold">
+            <label htmlFor="email" className="block text-orange-500 mb-1 font-semibold">
               Email
             </label>
             <input
@@ -89,7 +89,7 @@ const CheckoutPage: React.FC = () => {
             />
           </div>
           <div>
-            <label htmlFor="phone" className="block mb-1 font-semibold">
+            <label htmlFor="phone" className="block text-orange-500 mb-1 font-semibold">
               Telefone
             </label>
             <input
@@ -102,7 +102,7 @@ const CheckoutPage: React.FC = () => {
             />
           </div>
           <div>
-            <label htmlFor="date" className="block mb-1 font-semibold">
+            <label htmlFor="date" className="block text-orange-500 mb-1 font-semibold">
               Data da Reserva
             </label>
             <input
