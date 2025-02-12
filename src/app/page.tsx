@@ -16,8 +16,8 @@ import {
   Blockquote,
   Heading,
   Grid,
-  Link,
   TextField,
+  Link as RadixLink,
 } from "@radix-ui/themes";
 import { Separator } from "@radix-ui/themes";
 import Image from "next/image";
@@ -26,6 +26,8 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
+import CheckoutButton from "@/components/CheckoutButton";
+import NextLink from "next/link";
 
 const getProperty = (note: any, property: string) => note[property];
 
@@ -88,11 +90,14 @@ export default function DashboardPage() {
             value={filterKeyword}
             onChange={(e) => setFilterKeyword(e.target.value)}
           />
-          <Select.Root size="3"
+          <Select.Root
+            size="3"
             value={sortOption}
             onValueChange={(value) => setSortOption(value)}
           >
-            <Select.Trigger  color="orange" />
+            <Select.Trigger color="orange">
+              
+            </Select.Trigger>
             <Select.Content>
               <Select.Group>
                 <Select.Label>Ordenar por</Select.Label>
@@ -122,44 +127,49 @@ export default function DashboardPage() {
         {!loading && !error && (
           <Grid columns="repeat(auto-fit, minmax(250px, 1fr))" gap="6">
             {paginatedNotes.map((note) => (
-               <Link href={`/real-state/${note.temp_uuid}`} key={note.temp_uuid}>
-              <Card className="hover:shadow-xl transition-shadow">
-                <Swiper
-                  modules={[Navigation, Pagination]}
-                  navigation
-                  pagination={{ clickable: true }}
-                  loop
-                >
-                  {note.images.map((image: string, index: number) => (
-                    <SwiperSlide key={index}>
-                      <Image
-                        loader={customLoader}
-                        src={image}
-                        alt={`Imagem ${index + 1}`}
-                        width={300}
-                        height={200}
-                        className="rounded-lg"
-                      />
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-                <Flex pt="3" direction="column">
-                <Text truncate align="center" size="2" weight="bold">
-                  {note.tipologia} - {note.localizacao} -{" "}
-                  {note.preco.toLocaleString("pt-BR", {
-                    style: "currency",
-                    currency: "AOA",
-                  })}
-                </Text>
-                </Flex>
-                <Flex pt="1" direction="column">
-		
-		<Text align="center" color="gray" size="2">
-    Publicado {formatDateDistance(note.created_at)}
-		</Text>
-	</Flex>
-              </Card>
-              </Link>
+              <React.Fragment key={note.temp_uuid}>
+                <NextLink href={`/real-state/${note.temp_uuid}`} passHref>
+                  <RadixLink>
+                    <Card className="hover:shadow-xl transition-shadow">
+                      <Swiper
+                        modules={[Navigation, Pagination]}
+                        navigation
+                        pagination={{ clickable: true }}
+                        loop
+                      >
+                        {note.images.map((image: string, index: number) => (
+                          <SwiperSlide key={index}>
+                            <Image
+                              loader={customLoader}
+                              src={image}
+                              alt={`Imagem ${index + 1}`}
+                              width={300}
+                              height={200}
+                              className="rounded-lg"
+                            />
+                          </SwiperSlide>
+                        ))}
+                      </Swiper>
+                      <Flex pt="3" direction="column">
+                        <Text truncate align="center" size="2" weight="bold">
+                          {note.tipologia} - {note.localizacao} -{" "}
+                          {note.preco.toLocaleString("pt-BR", {
+                            style: "currency",
+                            currency: "AOA",
+                          })}
+                        </Text>
+                      </Flex>
+                      <Flex pt="1" direction="column">
+                        <Text align="center" color="gray" size="2">
+                          Publicado {formatDateDistance(note.created_at)}
+                        </Text>
+                      </Flex>
+                      <CheckoutButton noteId={note.temp_uuid} />
+                    </Card>
+                  </RadixLink>
+                </NextLink>
+                
+              </React.Fragment>
             ))}
           </Grid>
         )}
