@@ -28,6 +28,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import CheckoutButton from "@/components/CheckoutButton";
 import NextLink from "next/link";
+import Link from "next/link";
 
 const getProperty = (note: any, property: string) => note[property];
 
@@ -164,7 +165,15 @@ export default function DashboardPage() {
                           Publicado {formatDateDistance(note.created_at)}
                         </Text>
                       </Flex>
-                      <CheckoutButton noteId={note.temp_uuid} />
+                      <Link href={`/checkout/${note.temp_uuid}`}><Button
+                          className="w-full bg-orange-500 hover:bg-orange-400 text-white font-bold py-2 px-4 rounded"
+                            variant="solid"
+                            
+                            size="2"
+                          >
+                            Reservar
+                          </Button></Link>
+                      
                     </Card>
                   </RadixLink>
                 </NextLink>

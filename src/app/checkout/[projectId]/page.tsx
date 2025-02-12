@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Button } from "@radix-ui/themes";
 
 const CheckoutPage: React.FC = () => {
   const router = useRouter();
@@ -54,7 +55,7 @@ const CheckoutPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100 py-10">
       <div className="max-w-2xl mx-auto bg-white shadow p-6 rounded">
-        <h1 className="text-2xl font-bold text-center mb-4">
+        <h1 className="text-2xl text-orange-500 font-bold text-center mb-4">
           Checkout - Reserva de Casa
         </h1>
         <p className="text-center mb-6">
@@ -113,19 +114,19 @@ const CheckoutPage: React.FC = () => {
               required
             />
           </div>
-          <button
+          <Button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+            className="w-full cursor-pointer bg-orange-600 text-white py-2 rounded hover:bg-orange-300 transition"
             disabled={loading}
           >
             {loading ? "Reservando..." : "Reservar"}
-          </button>
+          </Button>
         </form>
         <div className="mt-4 text-center">
-          <Link href="/">
-            <a className="text-blue-600 hover:underline">
+          <Link href="/" className="text-orange-600 hover:underline">
+           
               Voltar para a página inicial
-            </a>
+            
           </Link>
         </div>
       </div>
