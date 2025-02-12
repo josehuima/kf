@@ -129,8 +129,8 @@ export default function DashboardPage() {
           <Grid columns="repeat(auto-fit, minmax(250px, 1fr))" gap="6">
             {paginatedNotes.map((note) => (
               <React.Fragment key={note.temp_uuid}>
-                <NextLink href={`/real-state/${note.temp_uuid}`} passHref>
-                  <RadixLink>
+                <Link href={`/real-state/${note.temp_uuid}`} passHref>
+                 
                     <Card className="hover:shadow-xl transition-shadow">
                       <Swiper
                         modules={[Navigation, Pagination]}
@@ -165,18 +165,11 @@ export default function DashboardPage() {
                           Publicado {formatDateDistance(note.created_at)}
                         </Text>
                       </Flex>
-                      <Link href={`/checkout/${note.temp_uuid}`}><Button
-                          className="w-full bg-orange-500 hover:bg-orange-400 text-white font-bold py-2 px-4 rounded"
-                            variant="solid"
-                            
-                            size="2"
-                          >
-                            Reservar
-                          </Button></Link>
+                     
                       
                     </Card>
-                  </RadixLink>
-                </NextLink>
+                 
+                </Link>
                 
               </React.Fragment>
             ))}

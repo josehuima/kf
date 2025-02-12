@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import React from "react";
 import Image from "next/image";
 import { Table, Box, Flex, Text, Card, Button, Separator } from "@radix-ui/themes";
-
+import Link from "next/link";
 
 
 export type paramsType = Promise<{ stateId: string }>;
@@ -212,6 +212,16 @@ async function Page(props: { params: paramsType }) {
               Angola
             </Text>
           </Box>
+          <Link href={`/checkout/${stateId}`}>
+                      <Button
+                          className="w-full bg-orange-500 hover:bg-orange-400 text-white font-bold py-2 px-4 rounded"
+                            variant="solid"
+                            
+                            size="2"
+                          >
+                            Reservar
+                          </Button>
+                          </Link>
         </Box>
       </Flex>
     </Box>
