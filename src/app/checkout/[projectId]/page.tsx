@@ -115,19 +115,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ params }) => {
               required
             />
           </div>
-          <div>
-            <label htmlFor="date" className="block text-orange-500 mb-1 font-semibold">
-              Data da Reserva
-            </label>
-            <input
-              id="date"
-              type="date"
-              value={reservationDate}
-              onChange={(e) => setReservationDate(e.target.value)}
-              className="w-full border p-2 rounded"
-              required
-            />
-          </div>
+          
           <Button
             type="submit"
             className="w-full cursor-pointer bg-orange-600 text-white py-2 rounded hover:bg-orange-300 transition"

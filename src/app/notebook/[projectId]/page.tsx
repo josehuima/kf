@@ -98,9 +98,6 @@ const NoteBookPage = async (props: { params: paramsType }) => {
     .from("WaterCert")
     .select("*");
 
-
-    
-
   if (tipologiaError || !tipologiasData || localizacaoError || !localizacoesData || naturezaError || !naturezaData || quintalError || !quintalData || realStateTypeError || !realStateTypeData || energyCertsError || !energyCertsData || waterCertsError || !waterCertsData) {
     return (
       <Box className="min-h-screen p-8">
@@ -147,7 +144,7 @@ const NoteBookPage = async (props: { params: paramsType }) => {
   }));
 
 
-  console.log('Tipologias encontrado: ', tipologias)
+  console.log('Tipologias encontrado: ', realStateTypes)
 
   return (
     <div className="border-stone-200 shadow-xl border rounded-lg px-16 py-8 w-full">

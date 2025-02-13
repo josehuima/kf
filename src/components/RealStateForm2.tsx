@@ -32,69 +32,60 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
   energyCerts,
   waterCerts,
 }) => {
-  // Estados para os campos já existentes
+  // Estados para os campos já existentes, garantindo que o valor seja sempre uma string
   const [tipologiaId, setTipologiaId] = useState<string>(
-    imovel.tipologia?.id?.toString() ?? ''
+    imovel.tipologia?.id?.toString() ?? ""
   );
-  
-  const [localizacaoId, setLocalizacaoId] = useState<number | string>(
-    imovel.localizacao?.id
+  const [localizacaoId, setLocalizacaoId] = useState<string>(
+    imovel.localizacao?.id?.toString() ?? ""
   );
-  
-  const [avaliable, setAvaliable] = useState(
-    imovel.avaliable
+  const [avaliable, setAvaliable] = useState<string>(
+    imovel.avaliable?.toString() ?? ""
   );
-  
-  const [preco, setPreco] = useState(
-    imovel.preco
+  const [preco, setPreco] = useState<string>(
+    imovel.preco?.toString() ?? ""
   );
-  
   const [descricao, setDescricao] = useState<string>(
-    imovel.descricao
+    imovel.descricao ?? ""
   );
-  
   const [bairro, setBairro] = useState<string>(
-    imovel.bairro
+    imovel.bairro ?? ""
   );
-  
   const [pontoReferencia, setPontoReferencia] = useState<string>(
-    imovel.pontoReferencia
+    imovel.pontoReferencia ?? ""
   );
-  
-  const [naturezaId, setNaturezaId] = useState<number | string>(
-    imovel.natureza?.id
+  const [naturezaId, setNaturezaId] = useState<string>(
+    imovel.natureza?.id?.toString() ?? ""
   );
-  
-  const [quintalId, setQuintalId] = useState<number | string>(
-    imovel.quintal?.id
+  const [quintalId, setQuintalId] = useState<string>(
+    imovel.quintal?.id?.toString() ?? ""
   );
-  
-  const [realStateTypeId, setRealStateTypeId] = useState<number | string>(
-    imovel.realStateType?.id
+  const [realStateTypeId, setRealStateTypeId] = useState<string>(
+    imovel.realStateType?.id?.toString() ?? ""
   );
-  
-  const [energyCertId, setEnergyCertId] = useState<number | string>(imovel.energyCert?.id
+  const [energyCertId, setEnergyCertId] = useState<string>(
+    imovel.energyCert?.id?.toString() ?? ""
   );
-  
-const [waterCertId, setWaterCertId] = useState<number | string>(imovel.waterCert?.id);
-  
+  const [waterCertId, setWaterCertId] = useState<string>(
+    imovel.waterCert?.id?.toString() ?? ""
+  );
+
   // Estados para upload de novas imagens
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [uploadProgress, setUploadProgress] = useState<number[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
 
   // Estados para as imagens já salvas
-  const [existingImages, setExistingImages] = useState<string[]>(imovel.images || []);
+  const [existingImages, setExistingImages] = useState<string[]>(
+    imovel.images || []
+  );
   const [removedExistingImages, setRemovedExistingImages] = useState<string[]>([]);
 
   // Configuração do dropzone
   const onDrop = (acceptedFiles: File[]) => {
     setSelectedFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
-    setUploadProgress((prev) => [
-      ...prev,
-      ...acceptedFiles.map(() => 0),
-    ]);
+    setUploadProgress((prev) => [...prev, ...acceptedFiles.map(() => 0)]);
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -177,26 +168,26 @@ const [waterCertId, setWaterCertId] = useState<number | string>(imovel.waterCert
             })
           )
         : [];
+        
 
-    // Monta o payload com os dados do formulário
+    // Monta o payload com os dados do formulário, convertendo '' para null se necessário
     const payload = {
       projectId: imovel.temp_uuid,
-      tipologiaId: tipologiaId === '' ? null : Number(tipologiaId),
-      localizacaoId: localizacaoId === '' ? null : localizacaoId,
-      avaliable: avaliable === '' ? null : avaliable,
-      preco: preco,
-      descricao: descricao === '' ? null : descricao,
-      bairro: bairro === '' ? null : bairro,
-      naturezaId: naturezaId === '' ? null : naturezaId,
-      quintalId: quintalId === '' ? null : quintalId,
-      pontoReferencia: pontoReferencia === '' ? null : pontoReferencia,
-      energyCertId: energyCertId === '' ? null : energyCertId,
-      waterCertId: waterCertId === '' ? null : waterCertId,
-      realStateTypeId: realStateTypeId === '' ? null : realStateTypeId,
+      tipologiaId: tipologiaId === "" ? null : Number(tipologiaId),
+      localizacaoId: localizacaoId === "" ? null : Number(localizacaoId),
+      avaliable: avaliable === "" ? null : avaliable,
+      preco: preco === "" ? null : Number(preco),
+      descricao: descricao === "" ? null : descricao,
+      bairro: bairro === "" ? null : bairro,
+      naturezaId: naturezaId === "" ? null : Number(naturezaId),
+      quintalId: quintalId === "" ? null : Number(quintalId),
+      pontoReferencia: pontoReferencia === "" ? null : pontoReferencia,
+      energyCertId: energyCertId === "" ? null : Number(energyCertId),
+      waterCertId: waterCertId === "" ? null : Number(waterCertId),
+      realStateTypeId: realStateTypeId === "" ? null : Number(realStateTypeId),
       newImages, // Novas imagens para salvar
       removedImages: removedExistingImages, // Imagens removidas para exclusão no backend
     };
-  
 
     try {
       const response = await fetch("/api/saveNote", {
@@ -220,7 +211,7 @@ const [waterCertId, setWaterCertId] = useState<number | string>(imovel.waterCert
     }
   };
 
-  console.log('Localizaçao id: ', localizacaoId);
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -230,17 +221,21 @@ const [waterCertId, setWaterCertId] = useState<number | string>(imovel.waterCert
           Tipologia
         </label>
         <select
-          id="tipologia"
-          value={tipologiaId}
-          onChange={(e) => setTipologiaId(e.target.value)}
-          className="w-full border p-2 rounded"
-        >
-          {tipologias.map((t) => (
-            <option key={t.id} value={t.id.toString()}>
-              {t.name}
-            </option>
-          ))}
-        </select>
+  id="tipologia"
+  value={tipologiaId}
+  onChange={(e) => setTipologiaId(e.target.value)}
+  className="w-full border p-2 rounded"
+>
+  <option value="" disabled>
+    Selecione o tipo
+  </option>
+  {tipologias.map((t) => (
+    <option key={t.id} value={t.id.toString()}>
+      {t.name}
+    </option>
+  ))}
+</select>
+
       </div>
 
       {/* Localização */}
@@ -251,11 +246,14 @@ const [waterCertId, setWaterCertId] = useState<number | string>(imovel.waterCert
         <select
           id="localizacao"
           value={localizacaoId}
-          onChange={(e) => setLocalizacaoId(Number(e.target.value))}
+          onChange={(e) => setLocalizacaoId(e.target.value)}
           className="w-full border p-2 rounded"
         >
+          <option value="" disabled>
+    Selecione o tipo
+  </option>
           {localizacoes.map((l) => (
-            <option key={l.id} value={l.id}>
+            <option key={l.id} value={l.id.toString()}>
               {l.name}
             </option>
           ))}
@@ -271,7 +269,7 @@ const [waterCertId, setWaterCertId] = useState<number | string>(imovel.waterCert
           id="preco"
           type="number"
           value={preco}
-          onChange={(e) => setPreco(Number(e.target.value))}
+          onChange={(e) => setPreco(e.target.value)}
           className="w-full border p-2 rounded"
         />
       </div>
@@ -340,11 +338,14 @@ const [waterCertId, setWaterCertId] = useState<number | string>(imovel.waterCert
         <select
           id="natureza"
           value={naturezaId}
-          onChange={(e) => setNaturezaId(Number(e.target.value))}
+          onChange={(e) => setNaturezaId(e.target.value)}
           className="w-full border p-2 rounded"
         >
+          <option value="" disabled>
+    Selecione o tipo
+  </option>
           {naturezas.map((n) => (
-            <option key={n.id} value={n.id}>
+            <option key={n.id} value={n.id.toString()}>
               {n.name}
             </option>
           ))}
@@ -359,11 +360,14 @@ const [waterCertId, setWaterCertId] = useState<number | string>(imovel.waterCert
         <select
           id="quintal"
           value={quintalId}
-          onChange={(e) => setQuintalId(Number(e.target.value))}
+          onChange={(e) => setQuintalId(e.target.value)}
           className="w-full border p-2 rounded"
         >
+          <option value="" disabled>
+    Selecione o tipo
+  </option>
           {quintalCerts.map((q) => (
-            <option key={q.id} value={q.id}>
+            <option key={q.id} value={q.id.toString()}>
               {q.name}
             </option>
           ))}
@@ -378,11 +382,14 @@ const [waterCertId, setWaterCertId] = useState<number | string>(imovel.waterCert
         <select
           id="realStateType"
           value={realStateTypeId}
-          onChange={(e) => setRealStateTypeId(Number(e.target.value))}
+          onChange={(e) => setRealStateTypeId(e.target.value)}
           className="w-full border p-2 rounded"
         >
+          <option value="" disabled>
+    Selecione o tipo
+  </option>
           {realStateTypes.map((rt) => (
-            <option key={rt.id} value={rt.id}>
+            <option key={rt.id} value={rt.id.toString()}>
               {rt.name}
             </option>
           ))}
@@ -397,11 +404,14 @@ const [waterCertId, setWaterCertId] = useState<number | string>(imovel.waterCert
         <select
           id="energyCert"
           value={energyCertId}
-          onChange={(e) => setEnergyCertId(Number(e.target.value))}
+          onChange={(e) => setEnergyCertId(e.target.value)}
           className="w-full border p-2 rounded"
         >
+          <option value="" disabled>
+    Selecione o tipo
+  </option>
           {energyCerts.map((ec) => (
-            <option key={ec.id} value={ec.id}>
+            <option key={ec.id} value={ec.id.toString()}>
               {ec.name}
             </option>
           ))}
@@ -416,11 +426,14 @@ const [waterCertId, setWaterCertId] = useState<number | string>(imovel.waterCert
         <select
           id="waterCert"
           value={waterCertId}
-          onChange={(e) => setWaterCertId(Number(e.target.value))}
+          onChange={(e) => setWaterCertId(e.target.value)}
           className="w-full border p-2 rounded"
         >
+          <option value="" disabled>
+    Selecione o tipo
+  </option>
           {waterCerts.map((wc) => (
-            <option key={wc.id} value={wc.id}>
+            <option key={wc.id} value={wc.id.toString()}>
               {wc.name}
             </option>
           ))}
@@ -429,7 +442,9 @@ const [waterCertId, setWaterCertId] = useState<number | string>(imovel.waterCert
 
       {/* Área de Drag and Drop para Imagens Novas */}
       <div>
-        <label className="block text-orange-600 font-medium mb-2">Imagens do Imóvel (novas)</label>
+        <label className="block text-orange-600 font-medium mb-2">
+          Imagens do Imóvel (novas)
+        </label>
         <div
           {...getRootProps()}
           className={`border-dashed border-2 border-orange-600 text-orange-600 p-4 text-center cursor-pointer ${
@@ -495,7 +510,9 @@ const [waterCertId, setWaterCertId] = useState<number | string>(imovel.waterCert
       {/* Área para exibir e remover as imagens já salvas */}
       {existingImages.length > 0 && (
         <div className="mt-4">
-          <h3 className="text-lg text-orange-600 font-medium">Imagens já salvas</h3>
+          <h3 className="text-lg text-orange-600 font-medium">
+            Imagens já salvas
+          </h3>
           <div className="mt-2 grid grid-cols-3 gap-4">
             {existingImages.map((url, index) => (
               <div key={index} className="relative">
