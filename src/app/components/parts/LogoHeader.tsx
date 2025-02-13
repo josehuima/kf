@@ -25,7 +25,7 @@ const LogoHeader: React.FC<LogoHeaderProps> = ({
   }, []);
 
   return (
-    <header className="flex items-center justify-between p-4 bg-orange-600 relative">
+    <header className="flex items-center justify-between p-4 bg-orange-500 relative">
       {/* Logotipo */}
       <Link href={href} passHref>
         <Image

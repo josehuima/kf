@@ -57,3 +57,15 @@ export type RealState = {
   realStateType: RealStateType;
   images: string[]; // Campo para URLs das imagens
 };
+
+
+
+export type Reservation = {
+  temp_uuid: string;
+  name: string;
+  email: string;
+  phone: string;
+  reservationDate: string;
+  propertyId: string;
+  created_at: string;
+};

@@ -5,7 +5,18 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@radix-ui/themes";
 
-const CheckoutPage: React.FC = () => {
+// Alteramos a tipagem para indicar que params é uma Promise
+export type ParamsType = Promise<{ projectId: string }>;
+
+interface CheckoutPageProps {
+  params: ParamsType;
+}
+
+const CheckoutPage: React.FC<CheckoutPageProps> = ({ params }) => {
+  // Desembrulha a Promise dos parâmetros usando o hook experimental React.use()
+  const resolvedParams = React.use(params);
+  const { projectId } = resolvedParams;
+
   const router = useRouter();
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -13,18 +24,21 @@ const CheckoutPage: React.FC = () => {
   const [reservationDate, setReservationDate] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
+
+  console.log("id da casa:", projectId);
+
+
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-
     // Monte o payload com os dados da reserva
     const payload = {
       name,
       email,
       phone,
-      reservationDate,
-      // Você pode incluir também o id da casa, se for necessário,
-      // por exemplo: houseId: <valor>
+      property_id: projectId,
+      
     };
 
     try {
@@ -124,9 +138,7 @@ const CheckoutPage: React.FC = () => {
         </form>
         <div className="mt-4 text-center">
           <Link href="/" className="text-orange-600 hover:underline">
-           
-              Voltar para a página inicial
-            
+            Voltar para a página inicial
           </Link>
         </div>
       </div>
