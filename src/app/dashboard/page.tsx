@@ -1,3 +1,4 @@
+
 import CreateNoteDialog from "@/components/CreateNoteDialog";
 import { Separator } from "@/components/ui/separator";
 import { auth } from "@clerk/nextjs/server";
@@ -5,7 +6,7 @@ import { UserButton } from "@clerk/nextjs";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { truncateText, formatDateDistance } from "../lib/utils";
 import DeleteNoteButton from "@/components/DeleteNoteButton"
@@ -27,9 +28,11 @@ const DashboardPage = async (props: Props) => {
 
   const supabase = createClient(supabaseUrl, supabaseAnonKey);
   const { data: notes } = await supabase
-    .from("imobiliarios")
+    .from("imo")
     .select()
     .eq("userId", userId);
+
+
 
   return (
     <>
@@ -68,14 +71,14 @@ const DashboardPage = async (props: Props) => {
                   <a href={`/notebook/${note.temp_uuid}`}>
                     <div className="border border-stone-300 rounded-lg overflow-hidden flex flex-col hover:shadow-xl transition hover:-translate-y-1">
                       <Image
+                      alt={note.natureza.name}
                         width={100}
                         height={50}
-                        alt={note.descricao}
                         src="notepad.svg"
                       />
                       <div className="p-4">
                         <h3 className="text-xl font-semibold text-gray-900">
-                          {truncateText(note.descricao, 10)}
+                          {note.natureza.name}
                         </h3>
                         <div className="h-1"></div>
                         <p className="text-sm text-gray-500">
