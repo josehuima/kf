@@ -12,6 +12,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import { RealState as Note } from "@/lib/db/schema";
+import RelatedHouses from "@/components/RelatedHouses";
 
 
 export type paramsType = Promise<{ stateId: string }>;
@@ -37,7 +38,7 @@ async function Page(props: { params: paramsType }) {
 
   // Consultar os dados
   const { data: notes, error } = await supabase
-    .from("imobiliarios")
+    .from("imo")
     .select()
     .eq("temp_uuid", stateId);
    
@@ -290,7 +291,10 @@ function formatDate(dateStr: string) {
                           </Button>
                           </Link>
         </Box>
+
+        
       </Flex>
+      {imobiliario && <RelatedHouses currentImovel={imobiliario} />}
     </Box>
   );
 }
