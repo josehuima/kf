@@ -37,6 +37,11 @@ const Footer: React.FC = () => {
                 FAQ
               </Link>
             </li>
+            <li>
+              <Link href="/terms-conditions" className="hover:text-gray-300">
+                Termos e Condições
+              </Link>
+            </li>
           </ul>
         </nav>
       </div>
