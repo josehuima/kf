@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     // Inserir no Supabase
     const { data, error } = await supabase
       .from('imoveis')
-      .insert({  'natureza': natureza,  'userId': userId, 'created_at': currentTimestamp,'avaliable': true }).select();
+      .insert({  'natureza': natureza,  'userId': userId, 'created_at': currentTimestamp,'avaliable': false }).select();
 
     if (error) {
       console.error("Erro ao inserir no Supabase:", error);
