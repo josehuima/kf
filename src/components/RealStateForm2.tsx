@@ -7,8 +7,10 @@ import { Button } from "@radix-ui/themes";
 import { RealState } from "@/lib/db/schema";
 import SuccessMessage from "@/components/SuccessMessage";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+
 
 export type Option = {
   id: number;
@@ -125,7 +127,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
         body: JSON.stringify({ projectId: imovel.temp_uuid, filePath: relativePath }),
       });
       const data = await response.json();
-      console.log("Resposta da API removeImage:", data);
+     
       if (response.ok) {
         toast.success("Imagem removida com sucesso!");
         setExistingImages((prev) => prev.filter((_, i) => i !== index));
@@ -212,7 +214,6 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
       newImages, // Novas imagens para salvar
     };
 
-    console.log("Payload enviado para API:", payload);
 
     try {
       const response = await fetch("/api/saveNote", {
@@ -220,7 +221,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      console.log("Resposta da API:", response);
+     
       if (response.ok) {
         setShowSuccess(true);
         toast.success("Imóvel atualizado com sucesso!");
@@ -542,6 +543,8 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
       <Button type="submit" className="bg-orange-500 text-white px-4 py-2 rounded" disabled={isUploading}>
         {isUploading ? "Enviando..." : "Salvar"}
       </Button>
+
+      <ToastContainer />
     </form>
   );
 };
