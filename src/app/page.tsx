@@ -176,7 +176,7 @@ export default function DashboardPage() {
           </Grid>
         )}
 
-        <Flex align="center" pt="9">
+        <Flex align="center" pt="9" pl="4" pr="4" justify="center">
           <Button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
@@ -184,7 +184,7 @@ export default function DashboardPage() {
           >
             Anterior
           </Button>
-          <Text>
+          <Text className="mx-1 text-gray-500 text-sm font-medium">
             Página {currentPage} de {totalPages}
           </Text>
           <Button

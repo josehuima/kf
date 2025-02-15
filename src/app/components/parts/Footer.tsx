@@ -17,11 +17,7 @@ const Footer: React.FC = () => {
                 Início
               </Link>
             </li>
-            <li>
-              <Link href="/about" className="hover:text-gray-300">
-               Sobre
-              </Link>
-            </li>
+            
             <li>
               <Link href="/services" className="hover:text-gray-300">
                 Serviços
@@ -32,11 +28,7 @@ const Footer: React.FC = () => {
                 Contato
               </Link>
             </li>
-            <li>
-              <Link href="/faq" className="hover:text-gray-300">
-                FAQ
-              </Link>
-            </li>
+            
             <li>
               <Link href="/terms-conditions" className="hover:text-gray-300">
                 Termos e Condições

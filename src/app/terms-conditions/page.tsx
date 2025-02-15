@@ -10,7 +10,7 @@ export default function TermsOfUsePage() {
       <section className="mb-4">
         <h2 className="text-xl font-semibold mb-2">1. Introdução</h2>
         <p className="text-gray-700">
-          Bem-vindo(a) à [Nome da Empresa/Projeto]! Estes Termos e Condições de Uso
+          Bem-vindo(a) ao <strong>Kubico Facil</strong>! Estes Termos e Condições de Uso
           regem o uso de nosso site e de quaisquer serviços fornecidos. Ao acessar
           ou usar nossos serviços, você concorda em cumprir estes Termos.
         </p>
@@ -51,7 +51,7 @@ export default function TermsOfUsePage() {
         <h2 className="text-xl font-semibold mb-2">5. Direitos de Propriedade Intelectual</h2>
         <p className="text-gray-700">
           Todo o conteúdo presente neste site, incluindo textos, imagens, marcas e
-          logotipos, é de propriedade exclusiva de [Nome da Empresa/Projeto] ou de
+          logotipos, é de propriedade exclusiva do <strong>Kubico Facil</strong> ou de
           terceiros licenciados. Qualquer uso, reprodução ou distribuição sem
           permissão é estritamente proibido.
         </p>
@@ -80,7 +80,10 @@ export default function TermsOfUsePage() {
         <p className="text-gray-700">
           Em caso de dúvidas sobre estes Termos, entre em contato conosco:
           <br />
-          Email: <a className="text-blue-500" href="mailto:contato@seudominio.com">contato@seudominio.com</a>
+          E-mail:{" "}
+          <a className="text-blue-500" href="mailto:geral@kubico.com">
+            geral@kubico.com
+          </a>
         </p>
       </section>
 
