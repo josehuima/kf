@@ -5,6 +5,8 @@ import { useDropzone } from "react-dropzone";
 import * as RadixProgress from "@radix-ui/react-progress";
 import { Button } from "@radix-ui/themes";
 import { RealState } from "@/lib/db/schema";
+import SuccessMessage from "@/components/SuccessMessage";
+import { useRouter } from "next/navigation";
 
 export type Option = {
   id: number;
@@ -70,11 +72,15 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
     imovel.waterCert?.id?.toString() ?? ""
   );
 
+  const router = useRouter();
+
   // Estados para upload de novas imagens
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [uploadProgress, setUploadProgress] = useState<number[]>([]);
   const [isUploading, setIsUploading] = useState<boolean>(false);
+  const [showSuccess, setShowSuccess] = useState<boolean>(false);
+
 
   // Estados para as imagens já salvas
   const [existingImages, setExistingImages] = useState<string[]>(
@@ -199,7 +205,11 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
       });
 
       if (response.ok) {
-        alert("Imóvel atualizado com sucesso!");
+        setShowSuccess(true);
+        
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 3000); // Aguarda 2 segundos antes de redirecionar
       } else {
         alert("Erro ao atualizar o imóvel.");
       }
@@ -274,19 +284,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
         />
       </div>
 
-      {/* Descrição */}
-      <div>
-        <label htmlFor="descricao" className="block text-orange-600 font-medium">
-          Descrição
-        </label>
-        <textarea
-          id="descricao"
-          value={descricao}
-          onChange={(e) => setDescricao(e.target.value)}
-          className="w-full border p-2 rounded"
-          rows={4}
-        />
-      </div>
+      
 
       {/* Data de Criação (apenas exibição) */}
       <div>
@@ -439,6 +437,19 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
           ))}
         </select>
       </div>
+      {/* Descrição */}
+      <div>
+        <label htmlFor="detalhes" className="block text-orange-600 font-medium">
+          Mais detalhes
+        </label>
+        <textarea
+          id="descricao"
+          value={descricao}
+          onChange={(e) => setDescricao(e.target.value)}
+          className="w-full border p-2 rounded"
+          rows={4}
+        />
+      </div>
 
       {/* Área de Drag and Drop para Imagens Novas */}
       <div>
@@ -539,6 +550,8 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
         className="bg-orange-500 text-white px-4 py-2 rounded"
         disabled={isUploading}
       >
+         
+         {showSuccess && <SuccessMessage message="Imóvel atualizado com sucesso!" />}
         {isUploading ? "Enviando..." : "Salvar"}
       </Button>
     </form>
