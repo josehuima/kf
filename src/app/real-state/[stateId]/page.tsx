@@ -4,6 +4,13 @@ import React from "react";
 import Image from "next/image";
 import { Table, Box, Flex, Text, Card, Button, Separator } from "@radix-ui/themes";
 import Link from "next/link";
+import {
+  Home as HomeIcon,
+  MapPin,
+  CheckCircle2,
+  Calendar,
+  DollarSign,
+} from "lucide-react";
 
 
 export type paramsType = Promise<{ stateId: string }>;
@@ -82,12 +89,27 @@ async function Page(props: { params: paramsType }) {
   );
   
 
+  // Função simples para formatar a data (publicação)
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 
 
 
 
   const imobiliario = propertiesWithImages[0];;
   const fotos = imobiliario?.images || [];
+
+    // Verifica disponibilidade (se "true", exibe "Disponível"; senão, "Indisponível")
+    const disponibilidade =
+    imobiliario.avaliable && imobiliario.avaliable === "true"
+      ? "Disponível"
+      : "Indisponível";
   return (
     <Box className="min-h-screen p-8 ">
       <Flex className="max-w-7xl mx-auto flex-col lg:flex-row bg-white rounded-lg shadow-lg overflow-hidden">
@@ -101,6 +123,66 @@ async function Page(props: { params: paramsType }) {
                     currency: "AOA",
                   })}
           </Text>
+
+           {/* Seção de ícones e informações */}
+           <Box className="mb-6 space-y-3">
+            {/* Tipologia */}
+            <Flex align="center" gap="2">
+              <HomeIcon className="text-orange-600" />
+              <Text size="2" className="text-orange-600">
+                Tipologia: {imobiliario.tipologia || "N/A"}
+              </Text>
+            </Flex>
+
+            {/* Localização */}
+            <Flex align="center" gap="2">
+              <MapPin className="text-orange-600" />
+              <Text size="2" className="text-orange-600">
+                Localização: {imobiliario.localizacao || "N/A"}
+              </Text>
+            </Flex>
+
+            {/* Disponibilidade */}
+            <Flex align="center" gap="2">
+              <CheckCircle2
+                className={`${
+                  disponibilidade === "Disponível"
+                    ? "text-green-600"
+                    : "text-red-500"
+                }`}
+              />
+              <Text
+                size="2"
+                className={`${
+                  disponibilidade === "Disponível"
+                    ? "text-green-600"
+                    : "text-red-500"
+                }`}
+              >
+                {disponibilidade}
+              </Text>
+            </Flex>
+
+            {/* Preço */}
+            <Flex align="center" gap="2">
+              <DollarSign className="text-orange-600" />
+              <Text size="2" className="text-orange-600">
+                Preço:{" "}
+                {imobiliario.preco.toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "AOA",
+                })}
+              </Text>
+            </Flex>
+
+            {/* Data de Publicação */}
+            <Flex align="center" gap="2">
+              <Calendar className="text-orange-600" />
+              <Text size="2" className="text-orange-600">
+                Publicado em: {formatDate(imobiliario.created_at)}
+              </Text>
+            </Flex>
+          </Box>
 
           {/* Galeria de Fotos */}
           {fotos.length > 0 ? (

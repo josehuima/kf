@@ -155,6 +155,7 @@ export default function DashboardPage() {
                               fill
                               className="rounded-lg object-cover"
                               quality={100}
+                              priority={true}
                             />
                           </div>
                         </SwiperSlide>
@@ -185,7 +186,7 @@ export default function DashboardPage() {
                       {/* Tipologia */}
                       <Flex align="center" gap="1">
                         <HomeIcon className="text-orange-600" />
-                        <Text size="2" className="text-orange-600">
+                        <Text size="1" className="text-orange-600">
                         
                           {note.tipologia.name ? note.tipologia.name : "Tipologia não definida"}
                         </Text>
@@ -194,7 +195,7 @@ export default function DashboardPage() {
                       {/* Localização */}
                       <Flex align="center" gap="1">
                       <MapPinCheckInside className="text-orange-600" />
-                      <Text size="2" className="text-orange-600">
+                      <Text size="1" className="text-orange-600">
                           {note.localizacao.name ? note.localizacao.name : "Localização não definida"}
                         </Text>
                       </Flex>
@@ -209,7 +210,7 @@ export default function DashboardPage() {
                       {/* Natureza */}
                       <Flex align="center" gap="1">
                         <HousePlusIcon className="text-orange-600" />
-                        <Text size="2" className="text-orange-600">
+                        <Text size="1" className="text-orange-600">
                           {note.natureza && note.natureza.name
                             ? note.natureza.name
                             : "N/A."}
@@ -219,7 +220,7 @@ export default function DashboardPage() {
                       {/* Energia */}
                       <Flex align="center" gap="1">
                         <EnergyIcon className="text-orange-600" />
-                        <Text size="2" className="text-orange-600">
+                        <Text size="1" className="text-orange-600">
                           {note.energyCert && note.energyCert.name
                             ? note.energyCert.name
                             : "Sem Cert."}
@@ -230,7 +231,7 @@ export default function DashboardPage() {
                       <Flex align="center" gap="1">
                       
                       <Droplet className="text-orange-600" />
-                      <Text size="2" className="text-orange-600">
+                      <Text size="1" className="text-orange-600">
                           {note.waterCert && note.waterCert.name
                             ? note.waterCert.name
                             : "Sem Cert."}
