@@ -25,16 +25,21 @@ const LogoHeader: React.FC<LogoHeaderProps> = ({
   }, []);
 
   return (
-    <header className="flex items-center justify-between p-4 bg-orange-500 relative">
-      {/* Logotipo */}
-      <Link href={href} passHref>
-        <Image priority={true}
+    // Definimos uma altura fixa (h-16) para o header
+    <header className="flex items-center justify-between px-4 h-20 bg-orange-500 relative">
+    {/* Container fixo para o logo (160px x 56px) */}
+    <Link href={href} passHref>
+      <div className="relative">
+        <Image
+          priority
           src="/logo2-removebg-preview.png"
           alt={altText}
-          width={120}
-          height={120}
+          width={150}
+          height={48}
+          className="object-contain"
         />
-      </Link>
+      </div>
+    </Link>
 
       {/* Ícone do menu hambúrguer - visível apenas em telas pequenas */}
       <button
