@@ -42,7 +42,20 @@ export default function DashboardPage() {
   const [minPrice, setMinPrice] = useState("0");
   const [maxPrice, setMaxPrice] = useState("100000000"); // Exemplo: 10 milhões AOA
   const [selectedNature, setSelectedNature] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("all");
   const [selectedRealStateType, setSelectedRealStateType] = useState("");
+
+  // 2. Extrair localizações únicas
+const locationOptions = useMemo(() => {
+  if (!notes) return [];
+  const setValues = new Set<string>();
+  notes.forEach((n) => {
+    if (n.localizacao?.name) {
+      setValues.add(n.localizacao.name);
+    }
+  });
+  return Array.from(setValues);
+}, [notes]);
 
   // Paginação
   const [currentPage, setCurrentPage] = useState(1);
@@ -98,7 +111,13 @@ export default function DashboardPage() {
         selectedRealStateType === "all" ||
         realStateName === selectedRealStateType;
 
-      return textMatch && priceMatch && natureMatch && realStateMatch;
+         // 5. Localização
+    const locName = note.localizacao?.name || "";
+    const locationMatch =
+      selectedLocation === "all" || locName === selectedLocation;
+
+
+      return textMatch && priceMatch && natureMatch && realStateMatch && locationMatch;
     });
   }, [
     sortedNotes,
@@ -107,6 +126,7 @@ export default function DashboardPage() {
     maxPrice,
     selectedNature,
     selectedRealStateType,
+    selectedLocation
   ]);
 
   // Paginação
@@ -242,6 +262,29 @@ export default function DashboardPage() {
               </Select.Group>
             </Select.Content>
           </Select.Root>
+
+          {/* Filtro de Localização */}
+<Select.Root
+  size="3"
+  value={selectedLocation}
+  onValueChange={(val) => {
+    setSelectedLocation(val);
+    setCurrentPage(1);
+  }}
+>
+  <Select.Trigger color="orange" placeholder="Localização" />
+  <Select.Content>
+    <Select.Group>
+      <Select.Item value="all">Todas as Localizações</Select.Item>
+      {locationOptions.map((loc) => (
+        <Select.Item key={loc} value={loc}>
+          {loc}
+        </Select.Item>
+      ))}
+    </Select.Group>
+  </Select.Content>
+</Select.Root>
+
 
           {/* Ordenar por */}
           <Select.Root
