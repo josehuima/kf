@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-
 export type Option = {
   id: number;
   name: string;
@@ -37,7 +36,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
   energyCerts,
   waterCerts,
 }) => {
-  // Estados para os campos já existentes, garantindo que o valor seja sempre uma string
+  // Campos do formulário
   const [tipologiaId, setTipologiaId] = useState<string>(
     imovel.tipologia?.id?.toString() ?? ""
   );
@@ -47,15 +46,9 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
   const [avaliable, setAvaliable] = useState<string>(
     imovel.avaliable?.toString() ?? ""
   );
-  const [preco, setPreco] = useState<string>(
-    imovel.preco?.toString() ?? ""
-  );
-  const [descricao, setDescricao] = useState<string>(
-    imovel.descricao ?? ""
-  );
-  const [bairro, setBairro] = useState<string>(
-    imovel.bairro ?? ""
-  );
+  const [preco, setPreco] = useState<string>(imovel.preco?.toString() ?? "");
+  const [descricao, setDescricao] = useState<string>(imovel.descricao ?? "");
+  const [bairro, setBairro] = useState<string>(imovel.bairro ?? "");
   const [pontoReferencia, setPontoReferencia] = useState<string>(
     imovel.pontoReferencia ?? ""
   );
@@ -84,39 +77,32 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
 
-
   // Estados para as imagens já salvas
   const [existingImages, setExistingImages] = useState<string[]>(
     imovel.images || []
   );
   const [removedExistingImages, setRemovedExistingImages] = useState<string[]>([]);
 
-  // Configuração do dropzone
+  // Configuração do Dropzone
   const onDrop = (acceptedFiles: File[]) => {
-    setSelectedFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
+    console.log("Arquivos recebidos:", acceptedFiles);
+    setSelectedFiles((prev) => [...prev, ...acceptedFiles]);
     setUploadProgress((prev) => [...prev, ...acceptedFiles.map(() => 0)]);
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      "image/*": [],
-    },
+    accept: { "image/*": [] },
   });
 
   useEffect(() => {
-    const newPreviews = selectedFiles.map((file) =>
-      URL.createObjectURL(file)
-    );
+    const newPreviews = selectedFiles.map((file) => URL.createObjectURL(file));
     setPreviews(newPreviews);
-
-    return () => {
-      newPreviews.forEach((url) => URL.revokeObjectURL(url));
-    };
+    return () => newPreviews.forEach((url) => URL.revokeObjectURL(url));
   }, [selectedFiles]);
 
   const removeImage = (index: number) => {
-    setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
     setUploadProgress((prev) => prev.filter((_, i) => i !== index));
     setPreviews((prev) => prev.filter((_, i) => i !== index));
   };
@@ -133,29 +119,36 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
       reader.readAsDataURL(file);
       reader.onload = () => {
         const result = reader.result as string;
-        const base64 = result.split(",")[1]; // remove o prefixo
+        // Exibe apenas os primeiros 30 caracteres para debug
+        console.log(`Arquivo ${file.name} convertido para base64 (início):`, result.substring(0, 30));
+        const base64 = result.split(",")[1];
         resolve(base64);
       };
-      reader.onerror = (error) => reject(error);
+      reader.onerror = (error) => {
+        console.error(`Erro na conversão de ${file.name}:`, error);
+        reject(error);
+      };
     });
   };
 
-  // Simula upload atualizando o progresso
+  // Simula o upload com progressão aleatória e suave
   const simulateUpload = (fileIndex: number): Promise<void> => {
     return new Promise((resolve) => {
       let progress = 0;
       const interval = setInterval(() => {
-        progress += 10;
+        progress += Math.floor(Math.random() * 15) + 5; // incremento aleatório
+        if (progress > 100) progress = 100;
         setUploadProgress((prev) => {
           const newProgress = [...prev];
           newProgress[fileIndex] = progress;
           return newProgress;
         });
+        console.log(`Progresso do arquivo ${selectedFiles[fileIndex].name}: ${progress}%`);
         if (progress >= 100) {
           clearInterval(interval);
           resolve();
         }
-      }, 200);
+      }, 300);
     });
   };
 
@@ -163,23 +156,21 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
     e.preventDefault();
     setIsUploading(true);
 
-    // Upload e conversão para base64 de novas imagens, se houver
+    // Processa o upload das novas imagens
     const newImages =
       selectedFiles.length > 0
         ? await Promise.all(
             selectedFiles.map(async (file, index) => {
+              console.log(`Iniciando upload do arquivo: ${file.name}`);
               await simulateUpload(index);
               const base64 = await fileToBase64(file);
-              return {
-                fileName: file.name,
-                base64,
-              };
+              console.log(`Upload simulado finalizado para: ${file.name}`);
+              return { fileName: file.name, base64 };
             })
           )
         : [];
-        
 
-    // Monta o payload com os dados do formulário, convertendo '' para null se necessário
+    // Monta o payload
     const payload = {
       projectId: imovel.temp_uuid,
       tipologiaId: tipologiaId === "" ? null : Number(tipologiaId),
@@ -195,24 +186,26 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
       waterCertId: waterCertId === "" ? null : Number(waterCertId),
       realStateTypeId: realStateTypeId === "" ? null : Number(realStateTypeId),
       newImages, // Novas imagens para salvar
-      removedImages: removedExistingImages, // Imagens removidas para exclusão no backend
+      
     };
+
+    console.log("Payload enviado para API:", payload);
 
     try {
       const response = await fetch("/api/saveNote", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
+      console.log("Resposta da API:", response);
+
       if (response.ok) {
         setShowSuccess(true);
-        
+        toast.success("Imóvel atualizado com sucesso!");
         setTimeout(() => {
           router.push("/dashboard");
-        }, 3000); // Aguarda 2 segundos antes de redirecionar
+        }, 3000);
       } else {
         toast.error("Erro ao atualizar o imóvel.");
       }
@@ -223,9 +216,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
       setIsUploading(false);
     }
   };
-
-
-
+  
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Tipologia */}
@@ -454,8 +445,8 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
         />
       </div>
 
-      {/* Área de Drag and Drop para Imagens Novas */}
-      <div>
+ {/* Seção de upload de imagens */}
+ <div>
         <label className="block text-orange-600 font-medium mb-2">
           Imagens do Imóvel (novas)
         </label>
@@ -469,22 +460,16 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
           {isDragActive ? (
             <p>Solte os arquivos aqui...</p>
           ) : (
-            <p>
-              Arraste e solte algumas imagens aqui, ou clique para selecionar
-            </p>
+            <p>Arraste e solte ou clique para selecionar imagens</p>
           )}
         </div>
 
-        {/* Pré-visualização das Imagens Novas com opção de remoção */}
+        {/* Pré-visualização com botão de remoção */}
         {previews.length > 0 && (
           <div className="mt-4 grid grid-cols-3 gap-4">
             {previews.map((url, index) => (
               <div key={index} className="relative">
-                <img
-                  src={url}
-                  alt={`Preview ${index}`}
-                  className="w-full h-32 object-cover rounded"
-                />
+                <img src={url} alt={`Preview ${index}`} className="w-full h-32 object-cover rounded" />
                 <Button
                   type="button"
                   onClick={() => removeImage(index)}
@@ -497,44 +482,33 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
           </div>
         )}
 
-        {/* Barras de Progresso para cada nova imagem */}
+        {/* Barras de progresso para cada arquivo */}
         {selectedFiles.length > 0 && (
-          <div className="mt-4 space-y-2">
+          <div className="mt-4 space-y-4">
             {selectedFiles.map((file, index) => (
-              <div key={index}>
-                <p className="text-sm">
-                  {file.name} - {uploadProgress[index] || 0}%
-                </p>
-                <RadixProgress.Root
-                  value={uploadProgress[index] || 0}
-                  max={100}
-                  className="h-4 w-full overflow-hidden rounded bg-gray-200"
-                >
+              <div key={index} className="space-y-1">
+                <p className="text-sm font-medium text-orange-600">{file.name}</p>
+                <RadixProgress.Root className="relative overflow-hidden h-4 rounded-full bg-gray-200 w-full">
                   <RadixProgress.Indicator
                     style={{ width: `${uploadProgress[index] || 0}%` }}
-                    className="h-full bg-blue-500 transition-all"
+                    className="bg-orange-500 h-full transition-all duration-300 ease-out"
                   />
                 </RadixProgress.Root>
+                <p className="text-sm text-gray-600">{uploadProgress[index] || 0}%</p>
               </div>
             ))}
           </div>
         )}
       </div>
 
-      {/* Área para exibir e remover as imagens já salvas */}
+      {/* Seção de imagens já salvas */}
       {existingImages.length > 0 && (
         <div className="mt-4">
-          <h3 className="text-lg text-orange-600 font-medium">
-            Imagens já salvas
-          </h3>
+          <h3 className="text-lg text-orange-600 font-medium">Imagens já salvas</h3>
           <div className="mt-2 grid grid-cols-3 gap-4">
             {existingImages.map((url, index) => (
               <div key={index} className="relative">
-                <img
-                  src={url}
-                  alt={`Imagem ${index}`}
-                  className="w-full h-32 object-cover rounded"
-                />
+                <img src={url} alt={`Imagem ${index}`} className="w-full h-32 object-cover rounded" />
                 <button
                   type="button"
                   onClick={() => removeExistingImage(index)}
@@ -548,13 +522,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
         </div>
       )}
 
-      <Button
-        type="submit"
-        className="bg-orange-500 text-white px-4 py-2 rounded"
-        disabled={isUploading}
-      >
-         
-         {showSuccess && <SuccessMessage message="Imóvel atualizado com sucesso!" />}
+      <Button type="submit" className="bg-orange-500 text-white px-4 py-2 rounded" disabled={isUploading}>
         {isUploading ? "Enviando..." : "Salvar"}
       </Button>
     </form>

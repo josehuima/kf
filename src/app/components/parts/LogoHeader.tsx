@@ -29,7 +29,7 @@ const LogoHeader: React.FC<LogoHeaderProps> = ({
       {/* Logotipo */}
       <Link href={href} passHref>
         <Image
-          src="/logo2.png"
+          src="/logo3.png"
           alt={altText}
           width={80}
           height={80}
