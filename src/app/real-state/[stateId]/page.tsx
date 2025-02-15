@@ -108,7 +108,7 @@ function formatDate(dateStr: string) {
         <Box className="lg:w-3/4 p-6">
           {/* Título */}
           <Text size="4" weight="bold" className="text-orange-600 mb-6">
-            {imobiliario.tipologia.name} - {imobiliario.localizacao.name} -{" "}
+            {imobiliario.tipologia.name} - {imobiliario.localizacao.name} - {" "}
                   {imobiliario.preco.toLocaleString("pt-BR", {
                     style: "currency",
                     currency: "AOA",

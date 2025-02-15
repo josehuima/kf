@@ -56,6 +56,7 @@ export type RealState = {
   waterCert: WaterCert;
   realStateType: RealStateType;
   images: string[]; // Campo para URLs das imagens
+  [key: string]: any;
 };
 
 

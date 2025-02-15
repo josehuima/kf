@@ -1,93 +1,144 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { formatDateDistance } from "./lib/utils";
 import { useNotes } from "./context/NotesContext";
 import {
   Button,
-  Box,
-  Spinner,
   Flex,
   Select,
-  Inset,
-  Strong,
   Text,
   Card,
-  Blockquote,
-  Heading,
   Grid,
-  TextField,
-  Link as RadixLink,
+  Separator,
+  Spinner, TextField,
+  Slider
 } from "@radix-ui/themes";
-import { Separator } from "@radix-ui/themes";
 import Image from "next/image";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
+
+// Ícones
 import {
   HomeIcon,
-
-  BackpackIcon,
-  BackpackIcon as NatureIcon,
   LightningBoltIcon as EnergyIcon,
 } from "@radix-ui/react-icons";
-import { Droplet, HousePlusIcon, Locate, MapPinCheckInside } from "lucide-react";
+import { Droplet, HousePlusIcon, MapPinCheck } from "lucide-react";
 
 import Link from "next/link";
 
-const getProperty = (note: any, property: string) => note[property];
+// Loader do Next/Image
+const customLoader = ({ src }: { src: string }) => src;
 
 export default function DashboardPage() {
   const { notes, loading, error } = useNotes();
-  const [sortOption, setSortOption] = useState<string>("created_at");
-  const [filterKeyword, setFilterKeyword] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  // Estados para filtros
+  const [sortOption, setSortOption] = useState("created_at");
+  const [filterKeyword, setFilterKeyword] = useState("");
+  const [minPrice, setMinPrice] = useState("0");
+  const [maxPrice, setMaxPrice] = useState("1000"); // Exemplo: 10 milhões AOA
+  const [selectedNature, setSelectedNature] = useState("");
+  const [selectedRealStateType, setSelectedRealStateType] = useState("");
+
+  // Paginação
+  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  const sortedNotes = notes
-    ? notes.sort((a, b) => {
-        const propA = getProperty(a, sortOption);
-        const propB = getProperty(b, sortOption);
+  // Ordenação
+  const sortedNotes = useMemo(() => {
+    if (!notes) return [];
+    return [...notes].sort((a, b) => {
+      const propA = a[sortOption];
+      const propB = b[sortOption];
 
-        if (typeof propA === "string" && typeof propB === "string") {
-          return propA.localeCompare(propB);
-        } else if (typeof propA === "number" && typeof propB === "number") {
-          return propA - propB;
-        }
-        return 0;
-      })
-    : [];
+      if (typeof propA === "string" && typeof propB === "string") {
+        return propA.localeCompare(propB);
+      } else if (typeof propA === "number" && typeof propB === "number") {
+        return propA - propB;
+      }
+      return 0;
+    });
+  }, [notes, sortOption]);
 
-// Substitua a parte do "filteredNotes" por algo como:
-const filteredNotes = sortedNotes.filter((note) => {
-  // Converte tudo para minúsculo
-  const tipologiaName = note.tipologia?.name?.toLowerCase() || "";
-  const descricao = note.descricao?.toLowerCase() || "";
-  const localizacaoName = note.localizacao?.name?.toLowerCase() || "";
-  const bairro = note.bairro?.toLowerCase() || "";
+  // Filtros
+  const filteredNotes = useMemo(() => {
+    const lowerKeyword = filterKeyword.toLowerCase();
 
-  // Se qualquer um desses campos contiver o `filterKeyword`, retorna true
-  return (
-    tipologiaName.includes(filterKeyword.toLowerCase()) ||
-    descricao.includes(filterKeyword.toLowerCase()) ||
-    localizacaoName.includes(filterKeyword.toLowerCase()) ||
-    bairro.includes(filterKeyword.toLowerCase())
-  );
-});
+    return sortedNotes.filter((note) => {
+      // Texto
+      const tipologiaName = note.tipologia?.name?.toLowerCase() || "";
+      const descricao = note.descricao?.toLowerCase() || "";
+      const localizacaoName = note.localizacao?.name?.toLowerCase() || "";
+      const bairro = note.bairro?.toLowerCase() || "";
+      const textMatch =
+        tipologiaName.includes(lowerKeyword) ||
+        descricao.includes(lowerKeyword) ||
+        localizacaoName.includes(lowerKeyword) ||
+        bairro.includes(lowerKeyword);
 
+      // Faixa de preço (convertemos minPrice e maxPrice para number)
+      const preco = note.preco || 0;
+      const minP = Number(minPrice);
+      const maxP = Number(maxPrice);
+      const priceMatch = preco >= minP && preco <= maxP;
 
+      // Natureza
+      const natureName = note.natureza?.name || "";
+      const natureMatch =
+        !selectedNature || selectedNature === "all" || natureName === selectedNature;
+
+      // Tipo de Imóvel
+      const realStateName = note.realStateType?.name || "";
+      const realStateMatch =
+        !selectedRealStateType ||
+        selectedRealStateType === "all" ||
+        realStateName === selectedRealStateType;
+
+      return textMatch && priceMatch && natureMatch && realStateMatch;
+    });
+  }, [
+    sortedNotes,
+    filterKeyword,
+    minPrice,
+    maxPrice,
+    selectedNature,
+    selectedRealStateType,
+  ]);
+
+  // Paginação
+  const totalPages = Math.ceil(filteredNotes.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedNotes = filteredNotes.slice(startIndex, endIndex);
-  const totalPages = Math.ceil(filteredNotes.length / itemsPerPage);
 
   const handlePageChange = (page: number) => {
-    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
   };
 
-  const customLoader = ({ src }: { src: string }) => src;
+  // Opções para selects
+  const natureOptions = useMemo(() => {
+    if (!notes) return [];
+    const setValues = new Set<string>();
+    notes.forEach((n) => {
+      if (n.natureza?.name) setValues.add(n.natureza.name);
+    });
+    return Array.from(setValues);
+  }, [notes]);
+
+  const realStateOptions = useMemo(() => {
+    if (!notes) return [];
+    const setValues = new Set<string>();
+    notes.forEach((n) => {
+      if (n.realStateType?.name) setValues.add(n.realStateType.name);
+    });
+    return Array.from(setValues);
+  }, [notes]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br">
@@ -98,23 +149,110 @@ const filteredNotes = sortedNotes.filter((note) => {
           </Text>
         </header>
 
-        {/* Filtros */}
+        {/* Seção de Filtros */}
         <Flex direction="column" gap="4" mb="9">
+          {/* Filtro de texto */}
           <TextField.Root
-            placeholder="Buscar por descrição ou local..."
+            placeholder="Buscar por descrição, local ou bairro..."
             size="3"
             color="orange"
             value={filterKeyword}
-            onChange={(e) => setFilterKeyword(e.target.value)}
+            onChange={(e) => {
+              setFilterKeyword(e.target.value);
+              setCurrentPage(1);
+            }}
           />
+
+          {/* Sliders de Preço */}
+          
+
+          <Flex direction="column" gap="2">
+            {/* Max Price Slider */}
+            <Flex align="center" gap="2">
+              <Text size="2">Preço:</Text>
+              <Text size="2" color="orange">
+                {Number(maxPrice).toLocaleString("pt-BR", {
+                  style: "currency",
+                  currency: "AOA",
+                })}
+              </Text>
+            </Flex>
+            <input
+  type="range"
+  min="1000"
+  max="10000000"
+  step="1000"
+  value={maxPrice}
+  onChange={(e) => {
+    setMaxPrice(e.target.value);
+    setCurrentPage(1);
+  }}
+  className="
+    w-full
+    cursor-pointer
+    
+    bg-orange-600
+    rounded-lg
+    sm:rounded-xl
+  "
+/>
+
+          </Flex>
+
+          {/* Filtro de Natureza */}
+          <Select.Root
+            size="3"
+            value={selectedNature}
+            onValueChange={(val) => {
+              setSelectedNature(val);
+              setCurrentPage(1);
+            }}
+          >
+            <Select.Trigger color="orange" placeholder="Selecione Natureza" />
+            <Select.Content>
+              <Select.Group>
+                <Select.Item value="all">Todas as Naturezas</Select.Item>
+                {natureOptions.map((nat) => (
+                  <Select.Item key={nat} value={nat}>
+                    {nat}
+                  </Select.Item>
+                ))}
+              </Select.Group>
+            </Select.Content>
+          </Select.Root>
+
+          {/* Filtro de Tipo de Imóvel */}
+          <Select.Root
+            size="3"
+            value={selectedRealStateType}
+            onValueChange={(val) => {
+              setSelectedRealStateType(val);
+              setCurrentPage(1);
+            }}
+          >
+            <Select.Trigger color="orange" placeholder="Tipo de Imóvel" />
+            <Select.Content>
+              <Select.Group>
+                <Select.Item value="all">Todos os Tipos</Select.Item>
+                {realStateOptions.map((rst) => (
+                  <Select.Item key={rst} value={rst}>
+                    {rst}
+                  </Select.Item>
+                ))}
+              </Select.Group>
+            </Select.Content>
+          </Select.Root>
+
+          {/* Ordenar por */}
           <Select.Root
             size="3"
             value={sortOption}
-            onValueChange={(value) => setSortOption(value)}
+            onValueChange={(value) => {
+              setSortOption(value);
+              setCurrentPage(1);
+            }}
           >
-            <Select.Trigger color="orange">
-              
-            </Select.Trigger>
+            <Select.Trigger color="orange" placeholder="Ordenar por" />
             <Select.Content>
               <Select.Group>
                 <Select.Label>Ordenar por</Select.Label>
@@ -128,33 +266,34 @@ const filteredNotes = sortedNotes.filter((note) => {
 
         <Separator size="2" my="6" />
 
+        {/* Loading / Erro */}
         {loading && (
           <Flex justify="center" align="center">
             <Spinner size="3" />
             <Text>Carregando imóveis...</Text>
           </Flex>
         )}
-
         {error && (
           <Text align="center" color="red">
             Erro: {error}
           </Text>
         )}
 
+        {/* Lista de Imóveis */}
         {!loading && !error && (
           <Grid columns="repeat(auto-fit, minmax(250px, 1fr))" gap="6">
-            {paginatedNotes.map((note) => (
+            {paginatedNotes.map((note: any) => (
               <React.Fragment key={note.temp_uuid}>
                 <Link href={`/real-state/${note.temp_uuid}`} passHref>
-                 
-                    <Card className="hover:shadow-xl transition-shadow">
-                      <Swiper
-                        modules={[Navigation, Pagination]}
-                        navigation
-                        pagination={{ clickable: true }}
-                        loop
-                      >
-                        {note.images.map((image: string, index: number) => (
+                  <Card className="hover:shadow-xl transition-shadow cursor-pointer">
+                    {/* Carrossel de imagens */}
+                    <Swiper
+                      modules={[Navigation, Pagination]}
+                      navigation
+                      pagination={{ clickable: true }}
+                      loop
+                    >
+                      {note.images.map((image: string, index: number) => (
                         <SwiperSlide key={index}>
                           <div className="relative w-full h-48">
                             <Image
@@ -164,16 +303,21 @@ const filteredNotes = sortedNotes.filter((note) => {
                               fill
                               className="rounded-lg object-cover"
                               quality={100}
-                              priority={true}
+                              priority
                             />
                           </div>
                         </SwiperSlide>
                       ))}
                     </Swiper>
 
-                    {/* Preço e data de publicação */}
+                    {/* Preço */}
                     <Flex pt="3" direction="column" align="center">
-                      <Text truncate size="3" weight="bold" className="text-orange-600">
+                      <Text
+                        truncate
+                        size="3"
+                        weight="bold"
+                        className="text-orange-600"
+                      >
                         {note.preco
                           ? note.preco.toLocaleString("pt-BR", {
                               style: "currency",
@@ -181,48 +325,34 @@ const filteredNotes = sortedNotes.filter((note) => {
                             })
                           : "Não definido"}
                       </Text>
-                      
                     </Flex>
 
                     {/* Ícones com propriedades */}
-                    <Flex
-                      direction="row"
-                      justify="center"
-                      gap="4"
-                      mt="3"
-                      mb="2"
-                    >
+                    <Flex direction="row" justify="center" gap="4" mt="3" mb="2">
                       {/* Tipologia */}
                       <Flex align="center" gap="1">
                         <HomeIcon className="text-orange-600" />
                         <Text size="1" className="text-orange-600">
-                        
-                          {note.tipologia.name ? note.tipologia.name : "Tipologia não definida"}
+                          {note.tipologia?.name || "Tipologia não definida"}
                         </Text>
                       </Flex>
 
-                      {/* Localização */}
+                      {/* Localização + Bairro */}
                       <Flex align="center" gap="1">
-                      <MapPinCheckInside className="text-orange-600" />
-                      <Text size="1" className="text-orange-600">
-                          {note.localizacao.name ? note.localizacao.name : "Localização não definida"} - {note.bairro ? note.bairro : "Bairro não definido"}
+                        <MapPinCheck className="text-orange-600" />
+                        <Text size="1" className="text-orange-600">
+                          {note.localizacao?.name || "Local N/D"} -{" "}
+                          {note.bairro || "Bairro N/D"}
                         </Text>
                       </Flex>
                     </Flex>
 
-                    <Flex
-                      direction="row"
-                      justify="center"
-                      gap="4"
-                      mb="3"
-                    >
+                    <Flex direction="row" justify="center" gap="4" mb="3">
                       {/* Natureza */}
                       <Flex align="center" gap="1">
                         <HousePlusIcon className="text-orange-600" />
                         <Text size="1" className="text-orange-600">
-                          {note.natureza && note.natureza.name
-                            ? note.natureza.name
-                            : "N/A."}
+                          {note.natureza?.name || "N/A"}
                         </Text>
                       </Flex>
 
@@ -230,28 +360,23 @@ const filteredNotes = sortedNotes.filter((note) => {
                       <Flex align="center" gap="1">
                         <EnergyIcon className="text-orange-600" />
                         <Text size="1" className="text-orange-600">
-                          {note.energyCert && note.energyCert.name
-                            ? note.energyCert.name
-                            : "Sem Cert."}
+                          {note.energyCert?.name || "Sem Cert."}
                         </Text>
                       </Flex>
 
                       {/* Água */}
                       <Flex align="center" gap="1">
-                      
-                      <Droplet className="text-orange-600" />
-                      <Text size="1" className="text-orange-600">
-                          {note.waterCert && note.waterCert.name
-                            ? note.waterCert.name
-                            : "Sem Cert."}
+                        <Droplet className="text-orange-600" />
+                        <Text size="1" className="text-orange-600">
+                          {note.waterCert?.name || "Sem Cert."}
                         </Text>
-                        
                       </Flex>
-                      
                     </Flex>
-                    <Text color="gray" size="2">
-                        Publicado {formatDateDistance(note.created_at)}
-                      </Text>
+
+                    {/* Data de publicação */}
+                    <Text color="gray" size="2" align="center" mb="3">
+                      Publicado {formatDateDistance(note.created_at)}
+                    </Text>
                   </Card>
                 </Link>
               </React.Fragment>
@@ -259,6 +384,7 @@ const filteredNotes = sortedNotes.filter((note) => {
           </Grid>
         )}
 
+        {/* Paginação */}
         <Flex align="center" pt="9" pl="4" pr="4" justify="center">
           <Button
             onClick={() => handlePageChange(currentPage - 1)}
