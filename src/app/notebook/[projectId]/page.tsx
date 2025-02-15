@@ -26,8 +26,6 @@ const NoteBookPage = async (props: { params: paramsType }) => {
     .select()
     .eq("temp_uuid", projectId);
 
-  console.log("Erro encontrado: ", error);
-
   if (error || !notes || notes.length === 0) {
     return (
       <Box className="min-h-screen p-8">
@@ -142,9 +140,6 @@ const NoteBookPage = async (props: { params: paramsType }) => {
     id: l.id,
     name: l.name,
   }));
-
-
-  console.log('Tipologias encontrado: ', realStateTypes)
 
   return (
     <div className="border-stone-200 shadow-xl border rounded-lg px-16 py-8 w-full">

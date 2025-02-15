@@ -28,11 +28,11 @@ const LogoHeader: React.FC<LogoHeaderProps> = ({
     <header className="flex items-center justify-between p-4 bg-orange-500 relative">
       {/* Logotipo */}
       <Link href={href} passHref>
-        <Image
-          src="/logo3.png"
+        <Image priority={true}
+          src="/logo2-removebg-preview.png"
           alt={altText}
-          width={80}
-          height={80}
+          width={120}
+          height={120}
         />
       </Link>
 

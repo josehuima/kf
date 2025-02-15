@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogClose
 } from "./ui/dialog";
 import { Loader2, Plus } from "lucide-react";
 import { Input } from "./ui/input";
@@ -149,9 +150,11 @@ const CreateNoteDialog = (props: Props) => {
           <div className="h-4"></div>
        <div className="h-4"></div>
           <div className="flex items-center gap-2">
-            <Button type="reset" variant="destructive">
-              Cancelar
-            </Button>
+          <DialogClose asChild>
+      <Button type="reset" variant="destructive">
+        Cancelar
+      </Button>
+    </DialogClose>
             <Button
   type="submit"
   className="bg-orange-600"
