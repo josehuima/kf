@@ -1,5 +1,5 @@
+export const runtime = "nodejs";
 
-"use client";
 
 import React from "react";
 import {
