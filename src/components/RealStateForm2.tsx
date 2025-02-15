@@ -5,7 +5,6 @@ import { useDropzone } from "react-dropzone";
 import * as RadixProgress from "@radix-ui/react-progress";
 import { Button } from "@radix-ui/themes";
 import { RealState } from "@/lib/db/schema";
-import SuccessMessage from "@/components/SuccessMessage";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";

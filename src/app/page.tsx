@@ -66,7 +66,7 @@ const filteredNotes = sortedNotes.filter((note) => {
   const tipologiaName = note.tipologia?.name?.toLowerCase() || "";
   const descricao = note.descricao?.toLowerCase() || "";
   const localizacaoName = note.localizacao?.name?.toLowerCase() || "";
-  const bairro = note.bairro.toLowerCase() || "";
+  const bairro = note.bairro?.toLowerCase() || "";
 
   // Se qualquer um desses campos contiver o `filterKeyword`, retorna true
   return (
@@ -205,7 +205,7 @@ const filteredNotes = sortedNotes.filter((note) => {
                       <Flex align="center" gap="1">
                       <MapPinCheckInside className="text-orange-600" />
                       <Text size="1" className="text-orange-600">
-                          {note.localizacao.name ? note.localizacao.name : "Localização não definida"}
+                          {note.localizacao.name ? note.localizacao.name : "Localização não definida"} - {note.bairro ? note.bairro : "Bairro não definido"}
                         </Text>
                       </Flex>
                     </Flex>
