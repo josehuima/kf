@@ -153,11 +153,9 @@ export default function DashboardPage() {
                       </Swiper>
                       <Flex pt="3" direction="column">
                         <Text truncate align="center" size="2" weight="bold">
-                          {note.tipologia} - {note.localizacao} -{" "}
-                          {note.preco.toLocaleString("pt-BR", {
-                            style: "currency",
-                            currency: "AOA",
-                          })}
+                        
+                        {note.preco ? note.preco.toLocaleString("pt-BR", { style: "currency", currency: "AOA" }) : "Não definido"}
+
                         </Text>
                       </Flex>
                       <Flex pt="1" direction="column">
