@@ -107,7 +107,7 @@ function formatDate(dateStr: string) {
 
     // Verifica disponibilidade (se "true", exibe "Disponível"; senão, "Indisponível")
     const disponibilidade =
-    imobiliario.avaliable && imobiliario.avaliable === "true"
+    imobiliario.avaliable && imobiliario.avaliable.toString() === "true"
       ? "Disponível"
       : "Indisponível";
   return (
