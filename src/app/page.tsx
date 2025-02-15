@@ -66,12 +66,14 @@ const filteredNotes = sortedNotes.filter((note) => {
   const tipologiaName = note.tipologia?.name?.toLowerCase() || "";
   const descricao = note.descricao?.toLowerCase() || "";
   const localizacaoName = note.localizacao?.name?.toLowerCase() || "";
+  const bairro = note.bairro.toLowerCase() || "";
 
   // Se qualquer um desses campos contiver o `filterKeyword`, retorna true
   return (
     tipologiaName.includes(filterKeyword.toLowerCase()) ||
     descricao.includes(filterKeyword.toLowerCase()) ||
-    localizacaoName.includes(filterKeyword.toLowerCase())
+    localizacaoName.includes(filterKeyword.toLowerCase()) ||
+    bairro.includes(filterKeyword.toLowerCase())
   );
 });
 
