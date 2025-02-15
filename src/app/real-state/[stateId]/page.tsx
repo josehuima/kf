@@ -42,11 +42,7 @@ async function Page(props: { params: paramsType }) {
     .from("imobiliarios")
     .select()
     .eq("temp_uuid", stateId);
-
-
-    console.log('Erro encontrado: ', error)
    
-
   if (error || !notes || notes.length === 0) {
     return (
       <Box className="min-h-screen p-8">
@@ -92,8 +88,6 @@ async function Page(props: { params: paramsType }) {
 
   const imobiliario = propertiesWithImages[0];;
   const fotos = imobiliario?.images || [];
-
-  console.log('Fotografias encontradas: ',fotos)
   return (
     <Box className="min-h-screen p-8 ">
       <Flex className="max-w-7xl mx-auto flex-col lg:flex-row bg-white rounded-lg shadow-lg overflow-hidden">
@@ -217,7 +211,7 @@ async function Page(props: { params: paramsType }) {
                           className="w-full bg-orange-500 hover:bg-orange-400 text-white font-bold py-2 px-4 rounded"
                             variant="solid"
                             
-                            size="2"
+                            size="4"
                           >
                             Reservar
                           </Button>

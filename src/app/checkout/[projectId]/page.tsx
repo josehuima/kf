@@ -4,6 +4,10 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@radix-ui/themes";
+import SuccessMessage from "@/components/SuccessMessage";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 // Alteramos a tipagem para indicar que params é uma Promise
 export type ParamsType = Promise<{ projectId: string }>;
@@ -23,10 +27,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ params }) => {
   const [phone, setPhone] = useState<string>("");
   const [reservationDate, setReservationDate] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-
-
-  console.log("id da casa:", projectId);
-
+  const [showSuccess, setShowSuccess] = useState<boolean>(false);
 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -52,15 +53,19 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ params }) => {
       });
 
       if (response.ok) {
-        alert("Reserva realizada com sucesso!");
+        setShowSuccess(true);
+
+        setTimeout(() => {
+          router.push("/thank-you");
+        }, 3000); // Aguarda 2 segundos antes de redirecionar
         // Após a reserva, redirecione para uma página de confirmação ou obrigado
-        router.push("/thank-you");
+       
       } else {
-        alert("Erro ao realizar a reserva. Tente novamente.");
+        toast.error("Erro ao atualizar o imóvel.");
       }
     } catch (error) {
       console.error("Erro na reserva:", error);
-      alert("Erro ao realizar a reserva. Tente novamente.");
+      toast.error("Erro ao enviar os dados do imóvel.");
     } finally {
       setLoading(false);
     }
@@ -121,6 +126,7 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ params }) => {
             className="w-full cursor-pointer bg-orange-600 text-white py-2 rounded hover:bg-orange-300 transition"
             disabled={loading}
           >
+             {showSuccess && <SuccessMessage message="Reserva efectuada com sucesso!" />}
             {loading ? "Reservando..." : "Reservar"}
           </Button>
         </form>

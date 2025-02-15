@@ -7,6 +7,9 @@ import { Button } from "@radix-ui/themes";
 import { RealState } from "@/lib/db/schema";
 import SuccessMessage from "@/components/SuccessMessage";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 export type Option = {
   id: number;
@@ -211,11 +214,11 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
           router.push("/dashboard");
         }, 3000); // Aguarda 2 segundos antes de redirecionar
       } else {
-        alert("Erro ao atualizar o imóvel.");
+        toast.error("Erro ao atualizar o imóvel.");
       }
     } catch (error) {
       console.error("Erro ao enviar os dados:", error);
-      alert("Erro ao enviar os dados do imóvel.");
+      toast.error("Erro ao enviar os dados do imóvel.");
     } finally {
       setIsUploading(false);
     }
