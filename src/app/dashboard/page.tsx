@@ -1,7 +1,4 @@
-// app/dashboard/page.tsx (Server Component)
-// No topo do seu arquivo server (page.tsx, por exemplo)
-export const runtime = "nodejs";
-
+export const runtime = "nodejs"; // Para usar APIs Node (como Clerk) sem Edge
 
 import { auth } from "@clerk/nextjs/server";
 import { createClient } from "@supabase/supabase-js";
@@ -33,8 +30,20 @@ type DashboardPageProps = {
 };
 
 
-export default async function DashboardPage({ searchParams }: DashboardPageProps) {
-  
+export default async function Page({
+  searchParams,
+}: {
+  searchParams?: {
+    page?: string;
+    search?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    nature?: string;
+    location?: string;
+    realStateType?: string;
+    sort?: string;
+  };
+}) { 
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
       "As variáveis de ambiente NEXT_PUBLIC_SUPABASE_URL ou NEXT_PUBLIC_SUPABASE_ANON_KEY não estão definidas."
