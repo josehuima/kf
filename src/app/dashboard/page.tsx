@@ -1,98 +1,101 @@
-export const runtime = "nodejs"; // Para usar APIs Node (Clerk) sem Edge
 
-import { auth } from "@clerk/nextjs/server";
-import { createClient } from "@supabase/supabase-js";
-import Link from "next/link";
-import Image from "next/image";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@radix-ui/themes";
-import { Separator } from "@/components/ui/separator";
 import CreateNoteDialog from "@/components/CreateNoteDialog";
-import DeleteNoteButton from "@/components/DeleteNoteButton";
-import { formatDateDistance } from "../lib/utils";
+import { Separator } from "@/components/ui/separator";
+import { auth } from "@clerk/nextjs/server";
+import { UserButton } from "@clerk/nextjs";
+import { ArrowLeft } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import React, { useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+import { truncateText, formatDateDistance } from "../lib/utils";
+import DeleteNoteButton from "@/components/DeleteNoteButton"
+import { Button } from "@radix-ui/themes";
 
-// IDs de admin
-const adminIds = process.env.NEXT_PUBLIC_ADMIN_IDS?.split(",") || [];
+type Props = {};
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export default async function DashboardPage() {
+const DashboardPage = async (props: Props) => {
+  const { userId } = await auth();
+
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
       "As variáveis de ambiente NEXT_PUBLIC_SUPABASE_URL ou NEXT_PUBLIC_SUPABASE_ANON_KEY não estão definidas."
     );
   }
 
-  // 1. Autenticação e verificação de admin
-  const { userId } = await auth();
-  const userIsAdmin = userId && adminIds.includes(userId);
-
-  // 2. Inicializa Supabase
   const supabase = createClient(supabaseUrl, supabaseAnonKey);
+  const { data: notes } = await supabase
+    .from("imo")
+    .select()
+    .eq("userId", userId);
 
-  // 3. Monta query base
-  let query = supabase.from("imo").select("*");
 
-  // Se não for admin, filtra pelo userId
-  if (!userIsAdmin) {
-    query = query.eq("userId", userId);
-  }
-
-  // Executa query
-  const { data: notes, error } = await query;
-  if (error) {
-    throw new Error("Erro ao buscar anúncios: " + error.message);
-  }
 
   return (
-    <div className="grainy min-h-screen p-10">
-      <div className="flex items-center gap-4 mb-6">
-        <Link href="/">
-          <Button className="bg-orange-600" size="3">
-            <ArrowLeft className="mr-1 w-4 h-4" />
-            Voltar
-          </Button>
-        </Link>
-        <h4 className="font-bold text-orange-900">
-          {userIsAdmin ? "Todos os anúncios" : "Meus anúncios"}
-        </h4>
-      </div>
-
-      <Separator className="my-4" />
-
-      <div className="grid sm:grid-cols-9 md:grid-cols-5 grid-cols-1 gap-2">
-        <CreateNoteDialog />
-
-        {(!notes || notes.length === 0) ? (
-          <div className="col-span-full text-center">
-            <h2 className="text-xl text-gray-500">Nenhum anúncio encontrado.</h2>
-          </div>
-        ) : (
-          notes.map((note) => (
-            <div key={note.temp_uuid} className="flex flex-col gap-2">
-              <Link href={`/notebook/${note.temp_uuid}`}>
-                <div className="border border-stone-300 rounded-lg overflow-hidden flex flex-col hover:shadow-xl transition hover:-translate-y-1">
-                  <Image
-                    alt={note.natureza?.name}
-                    width={100}
-                    height={50}
-                    src="notepad.svg"
-                  />
-                  <div className="p-4">
-                    <h3 className="text-xl font-semibold text-gray-900">
-                      {note.natureza?.name || "N/A"}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      {formatDateDistance(note.created_at)}
-                    </p>
-                  </div>
-                </div>
+    <>
+      <div className="grainy min-h-screen">
+        <div className="max-w-7xl mx-auto p-10">
+          <div className="h-14"></div>
+          <div className="flex justify-between items-center md:flex-row flex-col">
+            <div className="flex items-center">
+              <Link href="/">
+                <Button className="bg-orange-600" size="3">
+                  <ArrowLeft className="mr-1 w-4 h-4" />
+                  Voltar
+                </Button>
               </Link>
-              <DeleteNoteButton noteId={note.temp_uuid} />
+              <div className="w-4"></div>
+              <h4 className="font-bold text-orange-900">Meus anúncios</h4>
             </div>
-          ))
-        )}
+            
+          </div>
+
+          <div className="h-8"></div>
+          <Separator />
+          <div className="h-8"></div>
+          {notes?.length === 0 && (
+            <div className="text-center">
+              <h2 className="text-xl text-gray-500">Nenhum anúncio encontrado.</h2>
+            </div>
+          )}
+
+          <div className="grid sm:grid-cols-9 md:grid-cols-5 grid-cols-1 gap-2">
+            <CreateNoteDialog />
+
+            {notes?.map((note) => {
+              return (
+                <div key={note.temp_uuid} className="flex flex-col gap-2">
+                  <a href={`/notebook/${note.temp_uuid}`}>
+                    <div className="border border-stone-300 rounded-lg overflow-hidden flex flex-col hover:shadow-xl transition hover:-translate-y-1">
+                      <Image
+                      alt={note.natureza.name}
+                        width={100}
+                        height={50}
+                        src="notepad.svg"
+                      />
+                      <div className="p-4">
+                        <h3 className="text-xl font-semibold text-gray-900">
+                          {note.natureza.name}
+                        </h3>
+                        <div className="h-1"></div>
+                        <p className="text-sm text-gray-500">
+                          {formatDateDistance(note.created_at)}
+                        </p>
+                      </div>
+                    </div>
+                  </a>
+                  <DeleteNoteButton noteId={note.temp_uuid} />
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
-}
+};
+
+export default DashboardPage;
