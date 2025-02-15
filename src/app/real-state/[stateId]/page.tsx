@@ -11,20 +11,11 @@ import {
   Calendar,
   DollarSign,
 } from "lucide-react";
+import { RealState as Note } from "@/lib/db/schema";
 
 
 export type paramsType = Promise<{ stateId: string }>;
 
-type Note = {
-  temp_uuid: string;
-  tipologia: string;
-  localizacao: string;
-  avaliable: string;
-  preco: number;
-  descricao: string;
-  created_at: string;
-  images: string[]; // Campo para URLs das imagens
-};
 
 async function Page(props: { params: paramsType }) {
   const { stateId } = await props.params; // Remova o `await` aqui
@@ -117,7 +108,7 @@ function formatDate(dateStr: string) {
         <Box className="lg:w-3/4 p-6">
           {/* Título */}
           <Text size="4" weight="bold" className="text-orange-600 mb-6">
-            {imobiliario.tipologia} - {imobiliario.localizacao} -{" "}
+            {imobiliario.tipologia.name} - {imobiliario.localizacao.name} -{" "}
                   {imobiliario.preco.toLocaleString("pt-BR", {
                     style: "currency",
                     currency: "AOA",
@@ -130,7 +121,7 @@ function formatDate(dateStr: string) {
             <Flex align="center" gap="2">
               <HomeIcon className="text-orange-600" />
               <Text size="2" className="text-orange-600">
-                Tipologia: {imobiliario.tipologia || "N/A"}
+                Tipologia: {imobiliario.tipologia.name || "N/A"}
               </Text>
             </Flex>
 
@@ -138,7 +129,7 @@ function formatDate(dateStr: string) {
             <Flex align="center" gap="2">
               <MapPin className="text-orange-600" />
               <Text size="2" className="text-orange-600">
-                Localização: {imobiliario.localizacao || "N/A"}
+                Localização: {imobiliario.localizacao.name || "N/A"} - Bairro: {imobiliario.bairro || "N/A"}
               </Text>
             </Flex>
 
