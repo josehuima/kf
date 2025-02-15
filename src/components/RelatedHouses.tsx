@@ -62,7 +62,7 @@ export default function RelatedHouses({ currentImovel }: RelatedHousesProps) {
       <Flex className="p-6 max-w-7xl mx-auto flex-col lg:flex-row bg-white rounded-lg shadow-lg overflow-hidden" gap="4" wrap="wrap">
         {topRelated.map((imovel) => (
           <Link href={`/real-state/${imovel.temp_uuid}`} key={imovel.temp_uuid}>
-            <Card className="hover:shadow-md transition-shadow w-64 cursor-pointer">
+            <Card className="hover:shadow-md transition-shadow w-64 cursor-pointer w-full">
               {/* Se tiver imagens, exiba a primeira */}
               {imovel.images?.[0] && (
                 <div className="relative w-full h-40">
