@@ -1,4 +1,4 @@
-export const runtime = "nodejs"; // Para usar APIs Node (como Clerk) sem Edge
+export const runtime = "nodejs"; // Para usar APIs Node (Clerk) sem Edge
 
 import { auth } from "@clerk/nextjs/server";
 import { createClient } from "@supabase/supabase-js";
@@ -11,6 +11,7 @@ import CreateNoteDialog from "@/components/CreateNoteDialog";
 import DeleteNoteButton from "@/components/DeleteNoteButton";
 import { formatDateDistance } from "../lib/utils";
 
+// IDs de admin
 const adminIds = process.env.NEXT_PUBLIC_ADMIN_IDS?.split(",") || [];
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -19,124 +20,49 @@ export default async function DashboardPage({
   searchParams,
 }: {
   searchParams?: {
+    // Se não quiser nem o campo "search", remova tudo daqui
     page?: string;
     search?: string;
-    minPrice?: string;
-    maxPrice?: string;
-    nature?: string;
-    location?: string;
-    realStateType?: string;
-    sort?: string;
   };
-}) { 
+}) {
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
       "As variáveis de ambiente NEXT_PUBLIC_SUPABASE_URL ou NEXT_PUBLIC_SUPABASE_ANON_KEY não estão definidas."
     );
   }
 
-  // 1. Autenticação e verificação de admin
+  // Autenticação e verificação de admin
   const { userId } = await auth();
   const userIsAdmin = userId && adminIds.includes(userId);
 
-  // 2. Ler parâmetros de busca e paginação
+  // Paginação
   const page = parseInt(searchParams?.page || "1", 10) || 1;
   const pageSize = 8;
   const start = (page - 1) * pageSize;
   const end = start + pageSize - 1;
 
+  // Se ainda quiser um "search" básico:
   const search = searchParams?.search || "";
-  const minPrice = parseInt(searchParams?.minPrice || "0", 10) || 0;
-  const maxPrice = parseInt(searchParams?.maxPrice || "100000000", 10) || 100000000;
-  const selectedNature = searchParams?.nature || "all";
-  const selectedLocation = searchParams?.location || "all";
-  const selectedRealStateType = searchParams?.realStateType || "all";
-  const sortOption = searchParams?.sort || "created_at";
 
-  // 3. Inicializa o Supabase
+  // Inicializa Supabase
   const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-  // 4. Buscar as **opções** (natureza, localização, realStateType) diretamente do banco
-  //    Exemplo: distinct em "natureza->>name", "localizacao->>name", "realStateType->>name"
-  //    Precisamos agrupar manualmente, pois supabase .distinct() é limitado.
-
-  // Natureza
-  const { data: naturezaRows } = await supabase
-    .from("imo")
-    .select("natureza"); // puxa só esse campo
-
-    const natureSet = new Set<string>();
-    naturezaRows?.forEach((row) => {
-      if (row.natureza?.name) {
-        natureSet.add(row.natureza.name);
-      }
-    });
-  const natureOptions = Array.from(natureSet);
-
-  // Localização
-  const { data: locationRows } = await supabase
-    .from("imo")
-    .select("localizacao");
-
-  const locationSet = new Set<string>();
-  locationRows?.forEach((row) => {
-    if (row.localizacao?.name) locationSet.add(row.localizacao.name);
-  });
-  const locationOptions = Array.from(locationSet);
-
-  // Tipo de Imóvel
-  const { data: typeRows } = await supabase
-    .from("imo")
-    .select("realStateType");
-
-  const typeSet = new Set<string>();
-  typeRows?.forEach((row) => {
-    if (row.realStateType?.name) typeSet.add(row.realStateType.name);
-  });
-  const realStateOptions = Array.from(typeSet);
-
-  // 5. Montar query de anúncios
+  // Query base
   let query = supabase
     .from("imo")
     .select("*", { count: "exact" })
     .range(start, end);
 
+  // Se não for admin, filtra pelo userId
   if (!userIsAdmin) {
     query = query.eq("userId", userId);
   }
 
-  // Filtro de texto (natureza->>name, localizacao->>name, tipologia->>name, bairro, descricao)
+  // Se ainda quiser filtrar por texto:
   if (search) {
     query = query.or(
       `natureza->>name.ilike.%${search}%,localizacao->>name.ilike.%${search}%,tipologia->>name.ilike.%${search}%,bairro.ilike.%${search}%,detalhes.ilike.%${search}%`
     );
-  }
-
-  // Faixa de preço
-  query = query.gte("preco", minPrice).lte("preco", maxPrice);
-
-  // Natureza
-  if (selectedNature !== "all") {
-    query = query.eq("natureza->>name", selectedNature);
-  }
-
-  // Localização
-  if (selectedLocation !== "all") {
-    query = query.eq("localizacao->>name", selectedLocation);
-  }
-
-  // Tipo de Imóvel
-  if (selectedRealStateType !== "all") {
-    query = query.eq("realStateType->>name", selectedRealStateType);
-  }
-
-  // Ordenar
-  if (sortOption === "preco") {
-    query = query.order("preco", { ascending: true });
-  } else if (sortOption === "tipologia") {
-    query = query.order("tipologia->>name", { ascending: true });
-  } else {
-    query = query.order("created_at", { ascending: true });
   }
 
   // Executa
@@ -163,7 +89,8 @@ export default async function DashboardPage({
 
       <Separator className="my-4" />
 
-      {/* Form de Filtros */}
+      {/* Se quiser remover completamente o form de filtros, basta não renderizar nada aqui */}
+      {/* <DashboardFilters searchParams={searchParams ?? {}} /> */}
 
       <Separator className="my-4" />
 
@@ -205,7 +132,9 @@ export default async function DashboardPage({
       <div className="mt-8 flex gap-4 items-center">
         {page > 1 && (
           <Link
-            href={`?page=${page - 1}&search=${search}&minPrice=${minPrice}&maxPrice=${maxPrice}&nature=${selectedNature}&location=${selectedLocation}&realStateType=${selectedRealStateType}&sort=${sortOption}`}
+            href={`?page=${page - 1}${
+              search ? `&search=${search}` : ""
+            }`}
           >
             <Button variant="solid" color="orange">
               Anterior
@@ -217,7 +146,9 @@ export default async function DashboardPage({
         </span>
         {page < totalPages && (
           <Link
-            href={`?page=${page + 1}&search=${search}&minPrice=${minPrice}&maxPrice=${maxPrice}&nature=${selectedNature}&location=${selectedLocation}&realStateType=${selectedRealStateType}&sort=${sortOption}`}
+            href={`?page=${page + 1}${
+              search ? `&search=${search}` : ""
+            }`}
           >
             <Button variant="solid" color="orange">
               Próxima
