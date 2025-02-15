@@ -139,15 +139,17 @@ export default function DashboardPage() {
                         loop
                       >
                         {note.images.map((image: string, index: number) => (
-                          <SwiperSlide key={index}>
+                          <SwiperSlide key={index} >
+                            <div className="relative w-full h-48">
                             <Image
-                              loader={customLoader}
-                              src={image}
-                              alt={`Imagem ${index + 1}`}
-                              width={300}
-                              height={200}
-                              className="rounded-lg"
-                            />
+      loader={customLoader}
+      src={image}
+      alt={`Imagem ${index + 1}`}
+      fill // Ocupa todo o container (usa position:absolute)
+      className="rounded-lg object-cover" // Garante que a imagem se ajuste e corte o excesso
+      quality={100}
+    />
+                            </div>
                           </SwiperSlide>
                         ))}
                       </Swiper>
