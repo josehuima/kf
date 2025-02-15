@@ -40,7 +40,7 @@ export default function DashboardPage() {
   const [sortOption, setSortOption] = useState("created_at");
   const [filterKeyword, setFilterKeyword] = useState("");
   const [minPrice, setMinPrice] = useState("0");
-  const [maxPrice, setMaxPrice] = useState("1000"); // Exemplo: 10 milhões AOA
+  const [maxPrice, setMaxPrice] = useState("100000000"); // Exemplo: 10 milhões AOA
   const [selectedNature, setSelectedNature] = useState("");
   const [selectedRealStateType, setSelectedRealStateType] = useState("");
 
@@ -179,7 +179,7 @@ export default function DashboardPage() {
             </Flex>
             <input
   type="range"
-  min="1000"
+  min="10000"
   max="10000000"
   step="1000"
   value={maxPrice}
