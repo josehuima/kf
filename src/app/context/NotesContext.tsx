@@ -37,7 +37,7 @@ export const NotesProvider: React.FC<NotesProviderProps> = ({ children }) => {
         supabaseUrl,
     supabaseAnonKey
       );
-      const { data: properties, error } = await supabase.from("imo").select();
+      const { data: properties, error } = await supabase.from("imo").select().eq('avaliable', true);
 
       if (error) {
         throw new Error(`Erro ao buscar imóveis: ${error.message}`);
