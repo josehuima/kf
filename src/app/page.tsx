@@ -60,14 +60,21 @@ export default function DashboardPage() {
       })
     : [];
 
-  const filteredNotes = sortedNotes.filter((note) =>
-    ["tipologia", "descricao", "localizacao"].some((field) =>
-      getProperty(note, field)
-        ?.toString()
-        ?.toLowerCase()
-        ?.includes(filterKeyword.toLowerCase())
-    )
+// Substitua a parte do "filteredNotes" por algo como:
+const filteredNotes = sortedNotes.filter((note) => {
+  // Converte tudo para minúsculo
+  const tipologiaName = note.tipologia?.name?.toLowerCase() || "";
+  const descricao = note.descricao?.toLowerCase() || "";
+  const localizacaoName = note.localizacao?.name?.toLowerCase() || "";
+
+  // Se qualquer um desses campos contiver o `filterKeyword`, retorna true
+  return (
+    tipologiaName.includes(filterKeyword.toLowerCase()) ||
+    descricao.includes(filterKeyword.toLowerCase()) ||
+    localizacaoName.includes(filterKeyword.toLowerCase())
   );
+});
+
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
