@@ -9,7 +9,6 @@ import { Button } from "@radix-ui/themes";
 import { Separator } from "@/components/ui/separator";
 import CreateNoteDialog from "@/components/CreateNoteDialog";
 import DeleteNoteButton from "@/components/DeleteNoteButton";
-import DashboardFilters from "./DashboardFilters"; // <-- nosso componente de filtros
 import { formatDateDistance } from "../lib/utils";
 
 const adminIds = process.env.NEXT_PUBLIC_ADMIN_IDS?.split(",") || [];
@@ -165,12 +164,6 @@ export default async function DashboardPage({
       <Separator className="my-4" />
 
       {/* Form de Filtros */}
-      <DashboardFilters
-        searchParams={searchParams ?? {}}
-        natureOptions={natureOptions}
-        locationOptions={locationOptions}
-        realStateOptions={realStateOptions}
-      />
 
       <Separator className="my-4" />
 
