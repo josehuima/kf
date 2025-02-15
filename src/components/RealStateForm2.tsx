@@ -107,9 +107,27 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
     setPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const removeExistingImage = (index: number) => {
-    setRemovedExistingImages((prev) => [...prev, existingImages[index]]);
-    setExistingImages((prev) => prev.filter((_, i) => i !== index));
+  // Função para remover imagem já salva (chama a rota DELETE)
+  const handleRemoveExistingImage = async (filePath: string, index: number) => {
+    try {
+      console.log("Removendo imagem com filePath:", filePath);
+      const response = await fetch("/api/deletePhotos", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ projectId: imovel.temp_uuid, filePath }),
+      });
+      const data = await response.json();
+      console.log("Resposta da API removeImage:", data);
+      if (response.ok) {
+        toast.success("Imagem removida com sucesso!");
+        setExistingImages((prev) => prev.filter((_, i) => i !== index));
+      } else {
+        toast.error("Erro ao remover a imagem: " + data.error);
+      }
+    } catch (error) {
+      console.error("Erro ao remover a imagem:", error);
+      toast.error("Erro ao remover a imagem.");
+    }
   };
 
   // Converte arquivo para Base64
@@ -119,7 +137,6 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
       reader.readAsDataURL(file);
       reader.onload = () => {
         const result = reader.result as string;
-        // Exibe apenas os primeiros 30 caracteres para debug
         console.log(`Arquivo ${file.name} convertido para base64 (início):`, result.substring(0, 30));
         const base64 = result.split(",")[1];
         resolve(base64);
@@ -131,12 +148,12 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
     });
   };
 
-  // Simula o upload com progressão aleatória e suave
+  // Simula o upload com progressão aleatória
   const simulateUpload = (fileIndex: number): Promise<void> => {
     return new Promise((resolve) => {
       let progress = 0;
       const interval = setInterval(() => {
-        progress += Math.floor(Math.random() * 15) + 5; // incremento aleatório
+        progress += Math.floor(Math.random() * 15) + 5;
         if (progress > 100) progress = 100;
         setUploadProgress((prev) => {
           const newProgress = [...prev];
@@ -156,7 +173,6 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
     e.preventDefault();
     setIsUploading(true);
 
-    // Processa o upload das novas imagens
     const newImages =
       selectedFiles.length > 0
         ? await Promise.all(
@@ -170,7 +186,6 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
           )
         : [];
 
-    // Monta o payload
     const payload = {
       projectId: imovel.temp_uuid,
       tipologiaId: tipologiaId === "" ? null : Number(tipologiaId),
@@ -186,7 +201,6 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
       waterCertId: waterCertId === "" ? null : Number(waterCertId),
       realStateTypeId: realStateTypeId === "" ? null : Number(realStateTypeId),
       newImages, // Novas imagens para salvar
-      
     };
 
     console.log("Payload enviado para API:", payload);
@@ -197,9 +211,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-
       console.log("Resposta da API:", response);
-
       if (response.ok) {
         setShowSuccess(true);
         toast.success("Imóvel atualizado com sucesso!");
@@ -215,7 +227,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
     } finally {
       setIsUploading(false);
     }
-  };
+  }
   
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -445,7 +457,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
         />
       </div>
 
- {/* Seção de upload de imagens */}
+ {/* Seção de upload de novas imagens */}
  <div>
         <label className="block text-orange-600 font-medium mb-2">
           Imagens do Imóvel (novas)
@@ -463,8 +475,6 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
             <p>Arraste e solte ou clique para selecionar imagens</p>
           )}
         </div>
-
-        {/* Pré-visualização com botão de remoção */}
         {previews.length > 0 && (
           <div className="mt-4 grid grid-cols-3 gap-4">
             {previews.map((url, index) => (
@@ -481,8 +491,6 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
             ))}
           </div>
         )}
-
-        {/* Barras de progresso para cada arquivo */}
         {selectedFiles.length > 0 && (
           <div className="mt-4 space-y-4">
             {selectedFiles.map((file, index) => (
@@ -511,7 +519,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
                 <img src={url} alt={`Imagem ${index}`} className="w-full h-32 object-cover rounded" />
                 <button
                   type="button"
-                  onClick={() => removeExistingImage(index)}
+                  onClick={() => handleRemoveExistingImage(url, index)}
                   className="absolute top-1 right-1 bg-red-500 text-white px-2 py-1 text-xs rounded"
                 >
                   Remover
