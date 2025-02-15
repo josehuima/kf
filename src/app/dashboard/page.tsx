@@ -16,6 +16,7 @@ type Props = {};
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const adminIds = process.env.NEXT_PUBLIC_ADMIN_IDS?.split(",") || [];
 
 const DashboardPage = async (props: Props) => {
   const { userId } = await auth();
@@ -26,12 +27,27 @@ const DashboardPage = async (props: Props) => {
     );
   }
 
-  const supabase = createClient(supabaseUrl, supabaseAnonKey);
-  const { data: notes } = await supabase
-    .from("imo")
-    .select()
-    .eq("userId", userId);
+    // Verifica se o usuário é admin
+    const userIsAdmin = userId && adminIds.includes(userId);
 
+    console.log("userIsAdmin", userIsAdmin);
+    console.log("userId", userId);
+
+  const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+  let notes;
+  if (userIsAdmin) {
+    const { data: notesAdmin } = await supabase
+      .from("imo")
+      .select()
+    notes = notesAdmin
+  } else {
+    const { data: notesUser } = await supabase
+      .from("imo")
+      .select()
+      .eq("userId", userId);
+    notes = notesUser
+  }
 
 
   return (

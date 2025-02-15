@@ -7,6 +7,7 @@ import CustomSignOutButton from "@/components/ui/CustomSignOutButton";
 import CustomSignIn from "@/components/ui/CustomSignIn";
 import { UserButton, SignedOut, SignedIn } from "@clerk/nextjs";
 import { Menu, X } from "lucide-react";
+import { Button } from "@radix-ui/themes";
 
 type LogoHeaderProps = {
   altText?: string;
@@ -75,8 +76,10 @@ const LogoHeader: React.FC<LogoHeaderProps> = ({
           <div className="block md:hidden">
             <CustomSignOutButton />
           </div>
+          
         </SignedIn>
         </div>
+        
       </nav>
 
       {/* Área à direita: Avatar se logado ou botão de "Iniciar Sessão" se não logado */}
