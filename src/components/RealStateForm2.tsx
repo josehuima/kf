@@ -8,8 +8,9 @@ import { RealState } from "@/lib/db/schema";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useAuth } from "@clerk/nextjs";
 
-
+const adminIds = process.env.NEXT_PUBLIC_ADMIN_IDS?.split(",") || [];
 
 export type Option = {
   id: number;
@@ -25,7 +26,10 @@ interface RealStateFormProps {
   realStateTypes: Option[];
   energyCerts: Option[];
   waterCerts: Option[];
+
 }
+
+
 
 const RealStateForm: React.FC<RealStateFormProps> = ({
   imovel,
@@ -36,7 +40,12 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
   realStateTypes,
   energyCerts,
   waterCerts,
+
 }) => {
+
+
+  const { userId } = useAuth()
+
   // Campos do formulário
   const [tipologiaId, setTipologiaId] = useState<string>(
     imovel.tipologia?.id?.toString() ?? ""
@@ -70,6 +79,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
   );
 
   const router = useRouter();
+  const userIsAdmin = userId && adminIds.includes(userId);
 
   // Estados para upload de novas imagens
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -436,6 +446,26 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
           ))}
         </select>
       </div>
+
+      {userIsAdmin && (
+  <div>
+    <label htmlFor="avaliable" className="block text-orange-600 font-medium">
+      Disponibilidade
+    </label>
+    <select
+      id="avaliable"
+      value={avaliable}
+      onChange={(e) => setAvaliable(e.target.value)}
+      className="w-full border p-2 rounded"
+    >
+      <option value="">Selecione...</option>
+      <option value="true">Disponível</option>
+      <option value="false">Indisponível</option>
+    </select>
+  </div>
+)}
+
+      
       {/* Descrição */}
       <div>
         <label htmlFor="detalhes" className="block text-orange-600 font-medium">

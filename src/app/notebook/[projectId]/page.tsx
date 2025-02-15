@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { Box, Text } from "@radix-ui/themes";
 import RealStateForm, { Option } from "@/components/RealStateForm2";
 import { RealState } from "@/lib/db/schema";
+import { auth } from "@clerk/nextjs/server";
 
 export type paramsType = Promise<{ projectId: string }>;
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -11,6 +12,8 @@ const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 
 const NoteBookPage = async (props: { params: paramsType }) => {
   const { projectId } = await props.params;
+
+  const {userId} = await auth();
 
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
@@ -153,6 +156,7 @@ const NoteBookPage = async (props: { params: paramsType }) => {
         realStateTypes={realStateTypes} 
         energyCerts={energyCerts}
         waterCerts={waterCerts}
+        
       />
     </div>
   );
