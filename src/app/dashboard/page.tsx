@@ -1,4 +1,7 @@
 // app/dashboard/page.tsx (Server Component)
+// No topo do seu arquivo server (page.tsx, por exemplo)
+export const runtime = "nodejs";
+
 
 import { auth } from "@clerk/nextjs/server";
 import { createClient } from "@supabase/supabase-js";
@@ -16,9 +19,7 @@ const adminIds = process.env.NEXT_PUBLIC_ADMIN_IDS?.split(",") || [];
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export default async function DashboardPage({
-  searchParams,
-}: {
+type DashboardPageProps = {
   searchParams?: {
     page?: string;
     search?: string;
@@ -29,7 +30,11 @@ export default async function DashboardPage({
     realStateType?: string;
     sort?: string;
   };
-}) {
+};
+
+
+export default async function DashboardPage({ searchParams }: DashboardPageProps) {
+  
   if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
       "As variáveis de ambiente NEXT_PUBLIC_SUPABASE_URL ou NEXT_PUBLIC_SUPABASE_ANON_KEY não estão definidas."
