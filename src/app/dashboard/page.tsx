@@ -20,9 +20,7 @@ export default async function DashboardPage({
   searchParams,
 }: {
   searchParams?: {
-    // Se não quiser nem o campo "search", remova tudo daqui
     page?: string;
-    search?: string;
   };
 }) {
   if (!supabaseUrl || !supabaseAnonKey) {
@@ -31,23 +29,20 @@ export default async function DashboardPage({
     );
   }
 
-  // Autenticação e verificação de admin
+  // 1. Autenticação e verificação de admin
   const { userId } = await auth();
   const userIsAdmin = userId && adminIds.includes(userId);
 
-  // Paginação
+  // 2. Paginação
   const page = parseInt(searchParams?.page || "1", 10) || 1;
   const pageSize = 8;
   const start = (page - 1) * pageSize;
   const end = start + pageSize - 1;
 
-  // Se ainda quiser um "search" básico:
-  const search = searchParams?.search || "";
-
-  // Inicializa Supabase
+  // 3. Inicializa Supabase
   const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-  // Query base
+  // 4. Monta query base
   let query = supabase
     .from("imo")
     .select("*", { count: "exact" })
@@ -58,14 +53,7 @@ export default async function DashboardPage({
     query = query.eq("userId", userId);
   }
 
-  // Se ainda quiser filtrar por texto:
-  if (search) {
-    query = query.or(
-      `natureza->>name.ilike.%${search}%,localizacao->>name.ilike.%${search}%,tipologia->>name.ilike.%${search}%,bairro.ilike.%${search}%,detalhes.ilike.%${search}%`
-    );
-  }
-
-  // Executa
+  // Executa query
   const { data: notes, count, error } = await query;
   if (error) {
     throw new Error("Erro ao buscar anúncios: " + error.message);
@@ -89,11 +77,7 @@ export default async function DashboardPage({
 
       <Separator className="my-4" />
 
-      {/* Se quiser remover completamente o form de filtros, basta não renderizar nada aqui */}
-      {/* <DashboardFilters searchParams={searchParams ?? {}} /> */}
-
-      <Separator className="my-4" />
-
+      {/* Grid de anúncios */}
       <div className="grid sm:grid-cols-9 md:grid-cols-5 grid-cols-1 gap-2">
         <CreateNoteDialog />
 
@@ -131,11 +115,7 @@ export default async function DashboardPage({
       {/* Paginação */}
       <div className="mt-8 flex gap-4 items-center">
         {page > 1 && (
-          <Link
-            href={`?page=${page - 1}${
-              search ? `&search=${search}` : ""
-            }`}
-          >
+          <Link href={`?page=${page - 1}`}>
             <Button variant="solid" color="orange">
               Anterior
             </Button>
@@ -145,11 +125,7 @@ export default async function DashboardPage({
           Página {page} de {totalPages}
         </span>
         {page < totalPages && (
-          <Link
-            href={`?page=${page + 1}${
-              search ? `&search=${search}` : ""
-            }`}
-          >
+          <Link href={`?page=${page + 1}`}>
             <Button variant="solid" color="orange">
               Próxima
             </Button>
