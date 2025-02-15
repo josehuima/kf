@@ -300,22 +300,6 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
         />
       </div>
 
-      
-
-      {/* Data de Criação (apenas exibição) */}
-      <div>
-        <label htmlFor="created_at" className="block text-orange-600 font-medium">
-          Data de Criação
-        </label>
-        <input
-          id="created_at"
-          type="text"
-          value={imovel.created_at}
-          disabled
-          className="w-full border p-2 rounded bg-gray-100"
-        />
-      </div>
-
       {/* Bairro */}
       <div>
         <label htmlFor="bairro" className="block text-orange-600 font-medium">

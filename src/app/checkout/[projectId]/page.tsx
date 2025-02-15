@@ -5,9 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@radix-ui/themes";
 import SuccessMessage from "@/components/SuccessMessage";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 
 // Alteramos a tipagem para indicar que params é uma Promise
 export type ParamsType = Promise<{ projectId: string }>;
@@ -29,21 +28,19 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ params }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [showSuccess, setShowSuccess] = useState<boolean>(false);
 
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+
     // Monte o payload com os dados da reserva
     const payload = {
       name,
       email,
       phone,
       property_id: projectId,
-      
     };
 
     try {
-      // Chamada para o endpoint de reserva (ajuste a rota conforme sua API)
       const response = await fetch("/api/reserve", {
         method: "POST",
         headers: {
@@ -54,12 +51,10 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ params }) => {
 
       if (response.ok) {
         setShowSuccess(true);
-
+        toast.success("Reserva efectuada com sucesso!");
         setTimeout(() => {
           router.push("/thank-you");
-        }, 3000); // Aguarda 2 segundos antes de redirecionar
-        // Após a reserva, redirecione para uma página de confirmação ou obrigado
-       
+        }, 3000);
       } else {
         toast.error("Erro ao atualizar o imóvel.");
       }
@@ -73,6 +68,9 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ params }) => {
 
   return (
     <div className="min-h-screen bg-gray-100 py-10">
+      {/* 1. ToastContainer para exibir os toasts */}
+      <ToastContainer />
+
       <div className="max-w-2xl mx-auto bg-white shadow p-6 rounded">
         <h1 className="text-2xl text-orange-500 font-bold text-center mb-4">
           Checkout - Reserva de Casa
@@ -80,9 +78,13 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ params }) => {
         <p className="text-center mb-6">
           Preencha os dados para reservar a casa
         </p>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="name" className="block text-orange-500 mb-1 font-semibold">
+            <label
+              htmlFor="name"
+              className="block text-orange-500 mb-1 font-semibold"
+            >
               Nome
             </label>
             <input
@@ -95,7 +97,10 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ params }) => {
             />
           </div>
           <div>
-            <label htmlFor="email" className="block text-orange-500 mb-1 font-semibold">
+            <label
+              htmlFor="email"
+              className="block text-orange-500 mb-1 font-semibold"
+            >
               Email
             </label>
             <input
@@ -108,7 +113,10 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ params }) => {
             />
           </div>
           <div>
-            <label htmlFor="phone" className="block text-orange-500 mb-1 font-semibold">
+            <label
+              htmlFor="phone"
+              className="block text-orange-500 mb-1 font-semibold"
+            >
               Telefone
             </label>
             <input
@@ -120,16 +128,17 @@ const CheckoutPage: React.FC<CheckoutPageProps> = ({ params }) => {
               required
             />
           </div>
-          
+
           <Button
             type="submit"
             className="w-full cursor-pointer bg-orange-600 text-white py-2 rounded hover:bg-orange-300 transition"
             disabled={loading}
           >
-             {showSuccess && <SuccessMessage message="Reserva efectuada com sucesso!" />}
+
             {loading ? "Reservando..." : "Reservar"}
           </Button>
         </form>
+
         <div className="mt-4 text-center">
           <Link href="/" className="text-orange-600 hover:underline">
             Voltar para a página inicial

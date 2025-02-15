@@ -26,8 +26,15 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
-import CheckoutButton from "@/components/CheckoutButton";
-import NextLink from "next/link";
+import {
+  HomeIcon,
+
+  BackpackIcon,
+  BackpackIcon as NatureIcon,
+  LightningBoltIcon as EnergyIcon,
+} from "@radix-ui/react-icons";
+import { Droplet, HousePlusIcon, Locate, MapPinCheckInside } from "lucide-react";
+
 import Link from "next/link";
 
 const getProperty = (note: any, property: string) => note[property];
@@ -139,38 +146,104 @@ export default function DashboardPage() {
                         loop
                       >
                         {note.images.map((image: string, index: number) => (
-                          <SwiperSlide key={index} >
-                            <div className="relative w-full h-48">
+                        <SwiperSlide key={index}>
+                          <div className="relative w-full h-48">
                             <Image
-      loader={customLoader}
-      src={image}
-      alt={`Imagem ${index + 1}`}
-      fill // Ocupa todo o container (usa position:absolute)
-      className="rounded-lg object-cover" // Garante que a imagem se ajuste e corte o excesso
-      quality={100}
-    />
-                            </div>
-                          </SwiperSlide>
-                        ))}
-                      </Swiper>
-                      <Flex pt="3" direction="column">
-                        <Text truncate align="center" size="2" weight="bold">
-                        
-                        {note.preco ? note.preco.toLocaleString("pt-BR", { style: "currency", currency: "AOA" }) : "Não definido"}
+                              loader={customLoader}
+                              src={image}
+                              alt={`Imagem ${index + 1}`}
+                              fill
+                              className="rounded-lg object-cover"
+                              quality={100}
+                            />
+                          </div>
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
 
-                        </Text>
-                      </Flex>
-                      <Flex pt="1" direction="column">
-                        <Text align="center" color="gray" size="2">
-                          Publicado {formatDateDistance(note.created_at)}
-                        </Text>
-                      </Flex>
-                     
+                    {/* Preço e data de publicação */}
+                    <Flex pt="3" direction="column" align="center">
+                      <Text truncate size="3" weight="bold" className="text-orange-600">
+                        {note.preco
+                          ? note.preco.toLocaleString("pt-BR", {
+                              style: "currency",
+                              currency: "AOA",
+                            })
+                          : "Não definido"}
+                      </Text>
                       
-                    </Card>
-                 
+                    </Flex>
+
+                    {/* Ícones com propriedades */}
+                    <Flex
+                      direction="row"
+                      justify="center"
+                      gap="4"
+                      mt="3"
+                      mb="2"
+                    >
+                      {/* Tipologia */}
+                      <Flex align="center" gap="1">
+                        <HomeIcon className="text-orange-600" />
+                        <Text size="2" className="text-orange-600">
+                        
+                          {note.tipologia.name ? note.tipologia.name : "Tipologia não definida"}
+                        </Text>
+                      </Flex>
+
+                      {/* Localização */}
+                      <Flex align="center" gap="1">
+                      <MapPinCheckInside className="text-orange-600" />
+                      <Text size="2" className="text-orange-600">
+                          {note.localizacao.name ? note.localizacao.name : "Localização não definida"}
+                        </Text>
+                      </Flex>
+                    </Flex>
+
+                    <Flex
+                      direction="row"
+                      justify="center"
+                      gap="4"
+                      mb="3"
+                    >
+                      {/* Natureza */}
+                      <Flex align="center" gap="1">
+                        <HousePlusIcon className="text-orange-600" />
+                        <Text size="2" className="text-orange-600">
+                          {note.natureza && note.natureza.name
+                            ? note.natureza.name
+                            : "N/A."}
+                        </Text>
+                      </Flex>
+
+                      {/* Energia */}
+                      <Flex align="center" gap="1">
+                        <EnergyIcon className="text-orange-600" />
+                        <Text size="2" className="text-orange-600">
+                          {note.energyCert && note.energyCert.name
+                            ? note.energyCert.name
+                            : "Sem Cert."}
+                        </Text>
+                      </Flex>
+
+                      {/* Água */}
+                      <Flex align="center" gap="1">
+                      
+                      <Droplet className="text-orange-600" />
+                      <Text size="2" className="text-orange-600">
+                          {note.waterCert && note.waterCert.name
+                            ? note.waterCert.name
+                            : "Sem Cert."}
+                        </Text>
+                        
+                      </Flex>
+                      
+                    </Flex>
+                    <Text color="gray" size="2">
+                        Publicado {formatDateDistance(note.created_at)}
+                      </Text>
+                  </Card>
                 </Link>
-                
               </React.Fragment>
             ))}
           </Grid>
