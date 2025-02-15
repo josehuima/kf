@@ -56,10 +56,10 @@ export default function RelatedHouses({ currentImovel }: RelatedHousesProps) {
 
   return (
     <div className="mt-8">
-      <Text size="4" weight="bold" className="text-orange-600 mb-4">
+      <Text size="4" weight="bold" className="text-orange-600 mb-4 p-5">
         Você pode gostar também
       </Text>
-      <Flex gap="4" wrap="wrap">
+      <Flex className="p-6 max-w-7xl mx-auto flex-col lg:flex-row bg-white rounded-lg shadow-lg overflow-hidden" gap="4" wrap="wrap">
         {topRelated.map((imovel) => (
           <Link href={`/real-state/${imovel.temp_uuid}`} key={imovel.temp_uuid}>
             <Card className="hover:shadow-md transition-shadow w-64 cursor-pointer">
