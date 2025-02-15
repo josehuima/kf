@@ -16,21 +16,7 @@ const adminIds = process.env.NEXT_PUBLIC_ADMIN_IDS?.split(",") || [];
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-type DashboardPageProps = {
-  searchParams?: {
-    page?: string;
-    search?: string;
-    minPrice?: string;
-    maxPrice?: string;
-    nature?: string;
-    location?: string;
-    realStateType?: string;
-    sort?: string;
-  };
-};
-
-
-export default async function Page({
+export default async function DashboardPage({
   searchParams,
 }: {
   searchParams?: {
