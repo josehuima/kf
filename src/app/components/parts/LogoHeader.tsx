@@ -29,7 +29,7 @@ const LogoHeader: React.FC<LogoHeaderProps> = ({
       {/* Logotipo */}
       <Link href={href} passHref>
         <Image
-          src="/logo-kubico-facil.jpg"
+          src="/logo2.png"
           alt={altText}
           width={80}
           height={80}
@@ -50,6 +50,7 @@ const LogoHeader: React.FC<LogoHeaderProps> = ({
           menuOpen ? "block" : "hidden"
         } md:flex`}
       >
+         <div className="flex flex-col md:flex-row md:items-center md:space-x-6">
         <Link
           href="/"
           className="block px-4 py-2 text-orange-600 hover:text-orange-800"
@@ -70,6 +71,7 @@ const LogoHeader: React.FC<LogoHeaderProps> = ({
             <CustomSignOutButton />
           </div>
         </SignedIn>
+        </div>
       </nav>
 
       {/* Área à direita: Avatar se logado ou botão de "Iniciar Sessão" se não logado */}
