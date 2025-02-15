@@ -108,13 +108,21 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
   };
 
   // Função para remover imagem já salva (chama a rota DELETE)
-  const handleRemoveExistingImage = async (filePath: string, index: number) => {
+  const handleRemoveExistingImage = async (fullUrl: string, index: number) => {
     try {
-      console.log("Removendo imagem com filePath:", filePath);
+      // Extraia o caminho relativo a partir do URL completo.
+      // Supondo que o URL contenha a parte "/kubico-facil/", a parte após essa string é o caminho relativo.
+      const parts = fullUrl.split("/kubico-facil/");
+      if (parts.length < 2) {
+        throw new Error("Formato do URL inválido");
+      }
+      const relativePath = parts[1];
+      console.log("Caminho relativo extraído:", relativePath);
+      
       const response = await fetch("/api/deletePhotos", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ projectId: imovel.temp_uuid, filePath }),
+        body: JSON.stringify({ projectId: imovel.temp_uuid, filePath: relativePath }),
       });
       const data = await response.json();
       console.log("Resposta da API removeImage:", data);
@@ -129,6 +137,7 @@ const RealStateForm: React.FC<RealStateFormProps> = ({
       toast.error("Erro ao remover a imagem.");
     }
   };
+  
 
   // Converte arquivo para Base64
   const fileToBase64 = (file: File): Promise<string> => {
