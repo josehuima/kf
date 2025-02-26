@@ -8,8 +8,6 @@ export default function CustomSignIn() {
     <SignInButton >
       <Button>Iniciar sessão</Button>
     </SignInButton>
-
-<Button>Anunciar</Button>
 </div>
   )
 }

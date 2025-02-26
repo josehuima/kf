@@ -186,38 +186,7 @@ const locationOptions = useMemo(() => {
           {/* Sliders de Preço */}
           
 
-          <Flex direction="column" gap="2">
-            {/* Max Price Slider */}
-            <Flex align="center" gap="2">
-              <Text size="2">Preço:</Text>
-              <Text size="2" color="orange">
-                {Number(maxPrice).toLocaleString("pt-BR", {
-                  style: "currency",
-                  currency: "AOA",
-                })}
-              </Text>
-            </Flex>
-            <input
-  type="range"
-  min="10000"
-  max="10000000"
-  step="1000"
-  value={maxPrice}
-  onChange={(e) => {
-    setMaxPrice(e.target.value);
-    setCurrentPage(1);
-  }}
-  className="
-    w-full
-    cursor-pointer
-    
-    bg-orange-600
-    rounded-lg
-    sm:rounded-xl
-  "
-/>
-
-          </Flex>
+          
 
           {/* Filtro de Natureza */}
           <Select.Root
